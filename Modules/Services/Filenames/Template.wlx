@@ -1,0 +1,9 @@
+
+Component[Widget_, ProceedButton_] := With[{},
+    <div class="gap-y-2 flex flex-col">
+        <Widget/>
+        <ProceedButton/>
+    </div>
+]
+
+Component

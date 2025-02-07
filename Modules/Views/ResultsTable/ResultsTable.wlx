@@ -1,0 +1,232 @@
+sampleList[l_List] := ArrayResample[l, 300, Resampling->"Nearest"] /; Length[l] > 300;
+sampleList[l_List] := l;
+
+generatePreview[t_MaterialParameters, fdci_] := Graphics[{ColorData[97][2], Line[sampleList @ Select[QuantityMagnitude[t["\[Alpha]"], {1/"Centimeters", 1/"Centimeters"}], Function[item, item[[1]] >= fdci[[1]] && item[[1]] <= fdci[[2]] ]] ]}, ImageSize->{350,35}, ImagePadding->None, Axes->{True, False}];
+generatePreview[t_TransmissionObject, fdci_] := Graphics[{ColorData[97][1], Line[sampleList @ Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1/"Centimeters", 1/"Centimeters"}], Function[item, item[[1]] >= fdci[[1]] && item[[1]] <= fdci[[2]] ]] ]}, ImageSize->{350,35}, ImagePadding->None, Axes->{True, False}];
+
+generatePreview[_, _] := <span class="text-red-300 text-red-400 uppercase">unprocessed</span>;
+
+getIndex[t_MaterialParameters | t_TransmissionObject] := t["n0"]
+getIndex[_] := "N/A"
+
+getTitle[t_MaterialParameters | t_TransmissionObject] := FileBaseName[ t["Tags"]["Filename"][[1]] ]
+getTitle[File[t_]] := t 
+
+getThickness[t_MaterialParameters | t_TransmissionObject] := QuantityMagnitude[t["Thickness"], "Millimeters"]
+getThickness[_] := "N/A"
+
+getFDCI[t_MaterialParameters | t_TransmissionObject] := (QuantityMagnitude[#, 1/"Centimeters"] &/@ t["FDCI"]) {0.6, 1.4}
+getFDCI[_] := {}
+
+getFDCI[l_List] := getFDCI[SelectFirst[l, MatchQ[#, _MaterialParameters | _TransmissionObject]&]]
+
+tableWidget[files_List, Event_String, allowP_:False] := With[{
+  fdci = getFDCI[files],
+  allowProcess = If[allowP, "", "hidden"]
+}, With[{
+  ListTable = Table[With[{
+      RefractiveIndex = getIndex[file],
+      Thickness = getThickness[file],
+      Preview = generatePreview[file, fdci],
+      Title = getTitle[file]
+  },
+      <tr class="hover:bg-sky-100 focus:outline-none cursor-pointer" tabindex="1">
+              <td class="whitespace-nowrap py-2 pl-3 pr-3 text-sm text-gray-900 sm:pl-0"><Title/></td>
+              <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500"><RefractiveIndex/></td>
+              <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500"><Thickness/></td>
+              <td class="whitespace-nowrap px-3 py-2 text-sm text-left text-gray-500"><Preview/></td>
+      </tr>
+  ], {file, files}],
+
+  UId = CreateUUID[]
+},
+<div class="py-2 w-full py-2 align-middle">
+        <table class="w-full divide-y divide-gray-300">
+          <thead>
+            <tr>
+              <th scope="col" class="py-3 pl-3 pr-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 sm:pl-0">Filename</th>
+              <th scope="col" class="px-3 py-3 text-left text-xs font-medium tracking-wide text-gray-500">n</th>
+              <th scope="col" class="px-3 py-3 text-left text-xs font-medium tracking-wide uppercase text-gray-500">Thickness (mm)</th>
+              <th scope="col" class="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Preview</th>
+              <th id="{UId}-tools" scope="col" style="right:0" class="hidden absolute text-left flex mt-1 py-2 px-3 rounded bg-white flex-row gap-x-3 text-xs font-medium uppercase tracking-wide text-gray-500">
+                <button class="flex flex-col">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M12.0001 5.25C9.22586 5.25 6.79699 6.91121 5.12801 8.44832C4.28012 9.22922 3.59626 10.0078 3.12442 10.5906C2.88804 10.8825 2.70368 11.1268 2.57736 11.2997C2.51417 11.3862 2.46542 11.4549 2.43187 11.5029C2.41509 11.5269 2.4021 11.5457 2.393 11.559L2.38227 11.5747L2.37911 11.5794L2.10547 12.0132L2.37809 12.4191L2.37911 12.4206L2.38227 12.4253L2.393 12.441C2.4021 12.4543 2.41509 12.4731 2.43187 12.4971C2.46542 12.5451 2.51417 12.6138 2.57736 12.7003C2.70368 12.8732 2.88804 13.1175 3.12442 13.4094C3.59626 13.9922 4.28012 14.7708 5.12801 15.5517C6.79699 17.0888 9.22586 18.75 12.0001 18.75C14.7743 18.75 17.2031 17.0888 18.8721 15.5517C19.72 14.7708 20.4039 13.9922 20.8757 13.4094C21.1121 13.1175 21.2964 12.8732 21.4228 12.7003C21.4859 12.6138 21.5347 12.5451 21.5682 12.4971C21.585 12.4731 21.598 12.4543 21.6071 12.441L21.6178 12.4253L21.621 12.4206L21.6224 12.4186L21.9035 12L21.622 11.5809L21.621 11.5794L21.6178 11.5747L21.6071 11.559C21.598 11.5457 21.585 11.5269 21.5682 11.5029C21.5347 11.4549 21.4859 11.3862 21.4228 11.2997C21.2964 11.1268 21.1121 10.8825 20.8757 10.5906C20.4039 10.0078 19.72 9.22922 18.8721 8.44832C17.2031 6.91121 14.7743 5.25 12.0001 5.25ZM4.29022 12.4656C4.14684 12.2885 4.02478 12.1311 3.92575 12C4.02478 11.8689 4.14684 11.7115 4.29022 11.5344C4.72924 10.9922 5.36339 10.2708 6.14419 9.55168C7.73256 8.08879 9.80369 6.75 12.0001 6.75C14.1964 6.75 16.2676 8.08879 17.8559 9.55168C18.6367 10.2708 19.2709 10.9922 19.7099 11.5344C19.8533 11.7115 19.9753 11.8689 20.0744 12C19.9753 12.1311 19.8533 12.2885 19.7099 12.4656C19.2709 13.0078 18.6367 13.7292 17.8559 14.4483C16.2676 15.9112 14.1964 17.25 12.0001 17.25C9.80369 17.25 7.73256 15.9112 6.14419 14.4483C5.36339 13.7292 4.72924 13.0078 4.29022 12.4656ZM14.25 12C14.25 13.2426 13.2427 14.25 12 14.25C10.7574 14.25 9.75005 13.2426 9.75005 12C9.75005 10.7574 10.7574 9.75 12 9.75C13.2427 9.75 14.25 10.7574 14.25 12ZM15.75 12C15.75 14.0711 14.0711 15.75 12 15.75C9.92898 15.75 8.25005 14.0711 8.25005 12C8.25005 9.92893 9.92898 8.25 12 8.25C14.0711 8.25 15.75 9.92893 15.75 12Z" fill="currentColor"/>
+</svg>
+                  <span>View</span>
+                </button>
+
+                <button class="flex flex-col {allowProcess}">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 32 32"><path d="M21,16a6,6,0,1,1-6,6,6,6,0,0,1,6-6m0-2a8,8,0,1,0,8,8,8,8,0,0,0-8-8Z"/><path d="M26,4H6A2,2,0,0,0,4,6V26a2,2,0,0,0,2,2h4V26H6V12H28V6A2,2,0,0,0,26,4ZM6,10V6H26v4Z"/><polygon points="19 19 19 25 24 22 19 19"/><rect fill="none" width="32" height="32"/></svg>
+  
+  <span>Process</span>
+                </button> 
+
+<button class="flex flex-col">
+                  <svg class="w-5 h-5" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M924.086857 282.843429l-362.057143 210.724571v415.378286s227.108571-137.728 238.738286-144.384c11.190857-6.436571 26.331429 0.731429 28.891429 17.554285 0.146286 0.731429 1.462857 4.973714 1.462857 5.705143 1.536 18.212571-0.731429 26.770286-12.580572 33.718857l-273.993143 162.742858c-6.948571 3.510857-16.091429 5.485714-30.72-1.755429-7.168-3.218286-424.301714-255.268571-424.301714-255.268571a24.649143 24.649143 0 0 1-11.702857-20.772572V251.611429c0-2.486857-2.413714-25.526857 13.385143-35.913143L517.558857 2.633143a24.137143 24.137143 0 0 1 21.796572 0l426.276571 213.138286c9.508571 4.827429 17.481143 14.628571 16.749714 23.844571a29.622857 29.622857 0 0 1 0.512 5.412571v437.028572c0 16.164571-13.165714 29.257143-29.330285 29.257143h-0.073143a29.403429 29.403429 0 0 1-29.403429-29.330286V282.843429zM495.908571 903.972571V493.714286L141.604571 290.230857v397.677714L495.908571 904.045714zM191.195429 236.251429l337.188571 191.122285 337.042286-191.122285L528.310857 67.876571 191.195429 236.251429z" fill="currentColor" /></svg>
+  <span>Export</span>
+                </button>                 
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200" id="{UId}">
+            
+            <ListTable/>
+
+          </tbody>
+        </table>
+        <script type="module">
+
+          const tools = document.getElementById('<UId/>-tools');
+          const tb = document.getElementById('<UId/>');
+          const trs = Array.from(tb.getElementsByTagName('tr'));
+
+          let lastSelectedIndex = null;
+          let selectedRows = new Set();
+          let focusedIndex = 0; // Tracks the currently focused row
+
+          const toggleSelection = (index) => {
+            if (selectedRows.has(index)) {
+              selectedRows.delete(index);
+              trs[index].classList.remove('bg-teal-500/15');
+            } else {
+              selectedRows.add(index);
+              trs[index].classList.add('bg-teal-500/15');
+            }
+          };
+
+          const selectRange = (start, end) => {
+            const [from, to] = [start, end].sort((a, b) => a - b);
+            selectedRows.clear();
+            for (let i = from; i <= to; i++) {
+              selectedRows.add(i);
+              trs[i].classList.add('bg-teal-500/15');
+            }
+          };
+
+          const updateSelectionUI = () => {
+            trs.forEach((tr, index) => {
+              tr.classList.toggle('bg-teal-500/15', selectedRows.has(index));
+            });
+            if (selectedRows.size === 0) {
+              tools.classList.add('hidden');
+            } else {
+              tools.classList.remove('hidden');
+            }
+          };
+
+          const buttons = Array.from(tools.getElementsByTagName('button'));
+          buttons[0].addEventListener('click', () => {
+            if (selectedRows.size == 0) {
+              server.kernel.io.fire('<Event/>', [lastSelectedIndex + 1], 'View');
+              console.warn( [lastSelectedIndex + 1] );
+              return;
+            }
+            console.warn(  Array.from(selectedRows).map((e) => e+1) );
+            server.kernel.io.fire('<Event/>', Array.from(selectedRows).map((e) => e+1), 'View');
+          });
+
+          buttons[1].addEventListener('click', () => {
+            if (selectedRows.size == 0) {
+              console.warn( [lastSelectedIndex + 1] );
+              server.kernel.io.fire('<Event/>', [lastSelectedIndex + 1], 'Process');
+              return;
+            }            
+            server.kernel.io.fire('<Event/>', Array.from(selectedRows).map((e) => e+1), 'Process');
+          });          
+
+          buttons[2].addEventListener('click', () => {
+            if (selectedRows.size == 0) {
+              console.warn( [lastSelectedIndex + 1] );
+              server.kernel.io.fire('<Event/>', [lastSelectedIndex + 1], 'Export');
+              return;
+            }            
+            server.kernel.io.fire('<Event/>', Array.from(selectedRows).map((e) => e+1), 'Export');
+          });
+
+          trs.forEach((tr, i) => {
+            tr.addEventListener('click', (event) => {
+              
+            
+              event.preventDefault(); // Prevent text selection when holding Shift
+            
+              if (event.shiftKey && lastSelectedIndex !== null) {
+                selectRange(lastSelectedIndex, i);
+              } else if (event.metaKey || event.ctrlKey) {
+                toggleSelection(i);
+              } else {
+                selectedRows.clear();
+                selectedRows.add(i);
+                updateSelectionUI();
+              }
+            
+              lastSelectedIndex = i;
+              focusedIndex = i;
+            });
+          
+            tr.addEventListener('mousedown', (event) => event.preventDefault());
+          
+            tr.addEventListener('dblclick', (event) => {
+              console.warn( [lastSelectedIndex + 1] );
+              server.kernel.io.fire('<Event/>', [lastSelectedIndex+1], 'View');
+            });
+          });
+
+          // Handle keyboard navigation
+          document.addEventListener('keydown', (event) => {
+            if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+              return; // Don't interfere with form inputs
+            }
+          
+            if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+              event.preventDefault();
+            
+              let nextIndex = focusedIndex + (event.key === 'ArrowDown' ? 1 : -1);
+              nextIndex = Math.max(0, Math.min(trs.length - 1, nextIndex));
+            
+              if (event.shiftKey && lastSelectedIndex !== null) {
+                selectRange(lastSelectedIndex, nextIndex);
+              } else if (event.metaKey || event.ctrlKey) {
+                toggleSelection(nextIndex);
+              } else {
+                selectedRows.clear();
+                selectedRows.add(nextIndex);
+              }
+            
+              focusedIndex = nextIndex;
+              lastSelectedIndex = nextIndex;
+              updateSelectionUI();
+            }
+          
+            if (event.key === 'Enter' && selectedRows.size > 0) {
+              event.preventDefault();
+              console.warn( Array.from(selectedRows).map((e) => e+1));
+              server.kernel.io.fire('<Event/>', Array.from(selectedRows).map((e) => e+1), 'View');
+            }
+          
+            if (event.key === 'Escape') {
+              selectedRows.clear();
+              updateSelectionUI();
+              tools.classList.add('hidden');
+            }
+          });
+        </script>
+      </div>
+] ]
+
+
+tableWrapper[files_List, handlers_Association, OptionsPattern[]] := With[{
+  ev = CreateUUID[]
+},
+  EventHandler[ev, {
+      p_String :> Function[index,
+        handlers[p][ files[[ Flatten[ {index} ] ]] ];
+      ]
+  }];
+
+  tableWidget[files, ev, OptionValue["AllowProcessing"]]
+]
+
+Options[tableWrapper] = {"AllowProcessing" -> False}
+
+tableWrapper

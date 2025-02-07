@@ -1,0 +1,33 @@
+Component[Title_, OptionsPattern[]] := With[{
+    UId = CreateUUID[],
+    action = OptionValue["Action"],
+    Icon = OptionValue["Icon"],
+    class = OptionValue["Class"]
+},
+
+EventHandler[UId, Function[Null,
+    action // ReleaseHold;
+]];
+
+{
+    <button id="{UId}" title="{Title}" class="flex items-center gap-x-1 bg-gray-50 rounded border p-1 px-2 {class}">
+        <Icon/> <span class="text-xs ml-1"><Title/></span>
+    </button>
+,
+    <script type="module">
+        const btn = document.getElementById('<UId/>');
+
+        let spinner;
+
+        btn.addEventListener('click', () => {
+            server.kernel.io.fire('<UId/>', true)
+        });        
+            
+    </script>
+} // ToStringRiffle
+
+]
+
+Options[Component] = {"Icon" -> "", "Action" -> "", "Class" -> ""}
+
+Component

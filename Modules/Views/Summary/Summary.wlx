@@ -1,0 +1,424 @@
+views[All] = {"Alpha", "n", "Transmission", "ComplexTransmission", "NKPairs"}
+
+description["Alpha", {t__MaterialParameters}] = {"Absorption", "Absorption coefficient was calculated by solving equations for n and k extracted from the transmission data"}
+description["Alpha", {t__TransmissionObject}] = {"Absorption", "Absorption coefficient was calculated by taking -Log(T)/thickness using transmission data"}
+
+description["Transmission", _] = {"Transmission Spectrum", ""};
+description["n", {t__MaterialParameters}] = {"Refractive index", "Refractive index was calculated by solving equations for n and k extracted from the transmission data"}
+
+description["ComplexTransmission", _] = {"Complex Transmission Spectrum", "Includes power (T) and phase difference separately"};
+description["NKPairs", _] = {"Complex Refractive Index", "Includes n and k separately"};
+
+
+views["ComplexTransmission", {__TransmissionObject | __MaterialParameters}] := "";
+views["NKPairs", {__TransmissionObject}] := Null;
+views["NKPairs", {__MaterialParameters}] := "";
+
+exporter["ComplexTransmission", {t_TransmissionObject | t_MaterialParameters}] := With[{
+    data = QuantityMagnitude[t["Transmission"], {1/"Centimeters",1}],
+    phase = QuantityMagnitude[t["Phase"], {1/"Centimeters",1}][[All, 2]]
+},
+    Then[SystemDialogInputAsync["FileSave", {Null, {"ASCII Document" -> {"*.dat"}, "Tabular Formats" -> {"*.csv", "*.tsv"}}}], Function[path,
+        If[StringQ[path],
+            Export[path, Prepend[Transpose[Join[Transpose[data], {phase}]], {"wavenumber (1/cm)", "T", "Phase"}]]
+        ]
+    ]];
+]
+
+exporter["NKPairs", t_MaterialParameters] := With[{
+    n = QuantityMagnitude[t["n"], {1/"Centimeters",1}],
+    k = QuantityMagnitude[t["k"], {1/"Centimeters",1}][[All, 2]]
+},
+    Then[SystemDialogInputAsync["FileSave", {Null, {"ASCII Document" -> {"*.dat"}, "Tabular Formats" -> {"*.csv", "*.tsv"}}}], Function[path,
+        If[StringQ[path],
+            Export[path, Prepend[Transpose[Join[Transpose[n], {k}]], {"wavenumber (1/cm)", "n", "k"}]]
+        ]
+    ]];
+]
+
+exporter["ComplexTransmission", t: {__TransmissionObject | __MaterialParameters}] := With[{
+    data = QuantityMagnitude[#["Transmission"], {1/"Centimeters",1}] &/@ t,
+    phase = QuantityMagnitude[#["Phase"], {1/"Centimeters",1}][[All, 2]] &/@ t,
+    names = StringJoin[FileBaseName[#["Tags"]["Filename"][[1]]], ".dat"] &/@ t
+},
+
+    Then[SystemDialogInputAsync["Directory"], Function[path,
+        If[StringQ[path],
+            Export[FileNameJoin[{path, #[[3]]}], Prepend[Transpose[Join[Transpose[#[[1]]], {#[[2]]}]], {"wavenumber (1/cm)", "T", "Phase"}]] &/@ Transpose[{data,phase,names}]
+        ]
+    ]];     
+]
+
+exporter["NKPairs", t: {__MaterialParameters}] := With[{
+    n = QuantityMagnitude[#["n"], {1/"Centimeters",1}] &/@ t,
+    k = QuantityMagnitude[#["k"], {1/"Centimeters",1}][[All, 2]] &/@ t,
+    names = StringJoin[FileBaseName[#["Tags"]["Filename"][[1]]], ".dat"] &/@ t
+},
+    Then[SystemDialogInputAsync["Directory"], Function[path,
+        If[StringQ[path],
+            Export[FileNameJoin[{path, #[[3]]}], Prepend[Transpose[Join[Transpose[#[[1]]], {#[[2]]}]], {"wavenumber (1/cm)", "n", "k"}]] &/@ Transpose[{n,k,names}]
+        ]
+    ]];    
+]
+
+clipT[list_List] := Map[{#[[1]], Clip[#[[2]], {0,1}]}&, list]
+
+views["Transmission", {t_TransmissionObject | t_MaterialParameters}] := With[{
+    fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t["FDCI"]) {1/2.0, 2.0}
+},
+    Graphics[{
+        ColorData[97][5], Line[ Select[QuantityMagnitude[t["Transmission"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] // clipT ]
+    }, ImageSize->{500,350}, 
+        Frame->True, Axes->True, 
+        FrameLabel->{"wavenumber (cm^{-1})", "T"}
+    ]
+]
+
+views["Alpha", {t_TransmissionObject}] := With[{
+    fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t["FDCI"]) {1/2.0, 2.0}
+},
+    Graphics[{
+        ColorData[97][2], Line[ Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
+    }, ImageSize->{500,350}, 
+        Frame->True, Axes->True, 
+        FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
+    ]
+]
+
+views["Alpha", t: {__TransmissionObject}] := With[{
+    fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"]) {1/2.0, 2.0},
+    bdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"])
+},
+    With[{
+        dataset = Select[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] &/@ t,
+        bestset = Select[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= bdci[[1]] && i[[1]] <= bdci[[2]]]] &/@ t
+    },
+        With[{
+            step = Round[Differences[ MinMax[bestset[[1, All, 2]]] ][[1]], 50],
+            palette = Table[ColorData["DarkRainbow"][i / Length[dataset]], {i, Length[dataset]}]
+        },
+            Graphics[{
+                Transpose[{palette, MapIndexed[Function[{item, index}, 
+                    Line[ (# + {0, step (index - 1)}) &/@ item]
+                ], dataset]}]
+            }, ImageSize->{500,600}, 
+                Frame->True, Axes->True, 
+                FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
+            ]
+        ] 
+    ] 
+]
+
+views["Transmission", t: ({__TransmissionObject} | {__MaterialParameters})] := With[{
+    fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"]) {1/2.0, 2.0},
+    bdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"])
+},
+    With[{
+        dataset = clipT[Select[QuantityMagnitude[#["Transmission"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]]] &/@ t,
+        bestset = clipT[Select[QuantityMagnitude[#["Transmission"], {1/"Centimeters",1}], Function[i, i[[1]] >= bdci[[1]] && i[[1]] <= bdci[[2]]]]] &/@ t
+    },
+        With[{
+            step = Ceiling[Differences[ MinMax[bestset[[1, All, 2]]] ][[1]], 0.5] // Abs,
+            palette = Table[ColorData["DarkRainbow"][i / Length[dataset]], {i, Length[dataset]}]
+        },
+            Graphics[{
+                Transpose[{palette, MapIndexed[Function[{item, index}, 
+                    Line[ (# + {0, step (index[[1]] - 1)}) &/@ item]
+                ], dataset]}]
+            }, ImageSize->{500,600}, 
+                Frame->True, Axes->True, 
+                FrameLabel->{"wavenumber (cm^{-1})", "T"}
+            ]
+        ] 
+    ] 
+]
+
+exporter["Alpha", {t_TransmissionObject}] := With[{data = QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"]},
+    Then[SystemDialogInputAsync["FileSave", {Null, {"ASCII Document" -> {"*.dat"}, "Tabular Formats" -> {"*.csv", "*.tsv"}}}], Function[path,
+        If[StringQ[path],
+            Export[path, Prepend[data, {"wavenumber (1/cm)", "alpha (1/cm)"}]]
+        ]
+    ]];
+]
+
+exporter["Transmission", {t_TransmissionObject | t_MaterialParameters}] := With[{data = QuantityMagnitude[t["Transmission"], {1/"Centimeters",1}]},
+    Then[SystemDialogInputAsync["FileSave", {Null, {"ASCII Document" -> {"*.dat"}, "Tabular Formats" -> {"*.csv", "*.tsv"}}}], Function[path,
+        If[StringQ[path],
+            Export[path, Prepend[data, {"wavenumber (1/cm)", "T"}]]
+        ]
+    ]];
+]
+
+exporter["Alpha", t:{__TransmissionObject}] := With[{
+    data = QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"] &/@ t,
+    names = StringJoin[FileBaseName[#["Tags"]["Filename"][[1]]], ".dat"] &/@ t
+},
+    Then[SystemDialogInputAsync["Directory"], Function[path,
+        If[StringQ[path],
+            Export[FileNameJoin[{path, #[[2]]}], Prepend[#[[1]], {"wavenumber (1/cm)", "alpha (1/cm)"}]] &/@ Transpose[{data, names}]
+        ]
+    ]];
+]
+
+exporter["Transmission", t:({__TransmissionObject} | {__MaterialParameters})] := With[{
+    data = QuantityMagnitude[#["Approximated \[Alpha]"], {1/"Centimeters",1}] &/@ t,
+    names = StringJoin[FileBaseName[#["Tags"]["Filename"][[1]]], ".dat"] &/@ t
+},
+    Then[SystemDialogInputAsync["Directory"], Function[path,
+        If[StringQ[path],
+            Export[FileNameJoin[{path, #[[2]]}], Prepend[#[[1]], {"wavenumber (1/cm)", "T"}]] &/@ Transpose[{data, names}]
+        ]
+    ]];
+]
+
+views["Alpha", {t_MaterialParameters}] := With[{
+    fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t["FDCI"]) {1/2.0, 2.0}
+},
+    Graphics[{
+        ColorData[97][2], Line[ Select[QuantityMagnitude[t["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
+    }, ImageSize->{500,350}, 
+        Frame->True, Axes->True, 
+        FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
+    ]
+]
+
+
+views["Alpha", t: {__MaterialParameters}] := With[{
+    fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"]) {1/2.0, 2.0},
+    bdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"])
+},
+    With[{
+        dataset = Select[QuantityMagnitude[#["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] &/@ t,
+        bestset = Select[QuantityMagnitude[#["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= bdci[[1]] && i[[1]] <= bdci[[2]]]] &/@ t
+    },
+        With[{
+            step = Ceiling[Differences[ MinMax[bestset[[1, All, 2]]] ][[1]] // Abs, 50],
+            palette = Table[ColorData["DarkRainbow"][i / Length[dataset]], {i, Length[dataset]}]
+        },
+            Graphics[{
+                Transpose[{palette, MapIndexed[Function[{item, index}, 
+                    Line[ (# + {0, step (index[[1]] - 1)}) &/@ item]
+                ], dataset]}]
+            }, ImageSize->{500,600}, 
+                Frame->True, Axes->True, 
+                FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
+            ]
+        ] 
+    ] 
+]
+
+exporter["Alpha", t:{__MaterialParameters}] := With[{
+    data = QuantityMagnitude[#["\[Alpha]"], {1,1}/"Centimeters"] &/@ t,
+    names = StringJoin[FileBaseName[#["Tags"]["Filename"][[1]]], ".dat"] &/@ t
+},
+    Then[SystemDialogInputAsync["Directory"], Function[path,
+        If[StringQ[path],
+            Export[FileNameJoin[{path, #[[2]]}], Prepend[#[[1]], {"wavenumber (1/cm)", "alpha (1/cm)"}]] &/@ Transpose[{data, names}]
+        ]
+    ]];
+]
+
+exporter["Alpha", {t_MaterialParameters}] := With[{data = QuantityMagnitude[t["\[Alpha]"], {1,1}/"Centimeters"]},
+    Then[SystemDialogInputAsync["FileSave", {Null, {"ASCII Document" -> {"*.dat"}, "Tabular Formats" -> {"*.csv", "*.tsv"}}}], Function[path,
+        If[StringQ[path],
+            Export[path, Prepend[data, {"wavenumber (1/cm)", "alpha (1/cm)"}]]
+        ]
+    ]];
+]
+
+
+
+
+
+views["Alpha", {t_TransmissionObject}] := With[{
+    fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t["FDCI"]) {1/2.0, 2.0}
+},
+    Graphics[{
+        ColorData[97][2], Line[ Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
+    }, ImageSize->{500,350}, 
+        Frame->True, Axes->True, 
+        FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
+    ]
+]
+
+views["Alpha", t: {__TransmissionObject}] := With[{
+    fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"]) {1/2.0, 2.0},
+    bdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"])
+},
+    With[{
+        dataset = Select[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] &/@ t,
+        bestset = Select[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= bdci[[1]] && i[[1]] <= bdci[[2]]]] &/@ t
+    },
+        With[{
+            step = Ceiling[Differences[ MinMax[bestset[[1, All, 2]]] ][[1]] // Abs, 50],
+            palette = Table[ColorData["DarkRainbow"][i / Length[dataset]], {i, Length[dataset]}]
+        },
+            Graphics[{
+                Transpose[{palette, MapIndexed[Function[{item, index}, 
+                    Line[ (# + {0, step (index[[1]] - 1)}) &/@ item]
+                ], dataset]}]
+            }, ImageSize->{500,600}, 
+                Frame->True, Axes->True, 
+                FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
+            ]
+        ] 
+    ] 
+]
+
+exporter["Alpha", {t_TransmissionObject}] := With[{data = QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"]},
+    Then[SystemDialogInputAsync["FileSave", {Null, {"ASCII Document" -> {"*.dat"}, "Tabular Formats" -> {"*.csv", "*.tsv"}}}], Function[path,
+        If[StringQ[path],
+            Export[path, Prepend[data, {"wavenumber (1/cm)", "alpha (1/cm)"}]]
+        ]
+    ]];
+]
+
+exporter["Alpha", t:{__TransmissionObject}] := With[{
+    data = QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"] &/@ t,
+    names = StringJoin[FileBaseName[#["Tags"]["Filename"][[1]]], ".dat"] &/@ t
+},
+    Then[SystemDialogInputAsync["Directory"], Function[path,
+        If[StringQ[path],
+            Export[FileNameJoin[{path, #[[2]]}], Prepend[#[[1]], {"wavenumber (1/cm)", "alpha (1/cm)"}]] &/@ Transpose[{data, names}]
+        ]
+    ]];
+]
+
+views["n", {t_TransmissionObject}] := Null
+views["n", {t__TransmissionObject}] := Null
+
+views["n", {t_MaterialParameters}] := With[{
+    fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t["FDCI"]) {1/2.0, 2.0}
+},
+    Graphics[{
+        ColorData[97][2], Line[ Select[QuantityMagnitude[t["n"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
+    }, ImageSize->{500,150}, 
+        Frame->True, Axes->True, 
+        FrameLabel->{"wavenumber (cm^{-1})", "refractive index"}
+    ]
+]
+
+
+views["n", t: {__MaterialParameters}] := With[{
+    fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"]) {1/2.0, 2.0},
+    bdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"])
+},
+    With[{
+        dataset = Select[QuantityMagnitude[#["n"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] &/@ t,
+        bestset = Select[QuantityMagnitude[#["n"], {1/"Centimeters",1}], Function[i, i[[1]] >= bdci[[1]] && i[[1]] <= bdci[[2]]]] &/@ t
+    },
+        With[{
+            step = Ceiling[Differences[ MinMax[bestset[[1, All, 2]]] ][[1]], 2] // Abs,
+            palette = Table[ColorData["DarkRainbow"][i / Length[dataset]], {i, Length[dataset]}]
+        },
+            Graphics[{
+                Transpose[{palette, MapIndexed[Function[{item, index}, 
+                    Line[ (# + {0, step (index[[1]] - 1)}) &/@ item]
+                ], dataset]}]
+            }, ImageSize->{500,400}, 
+                Frame->True, Axes->True, 
+                FrameLabel->{"wavenumber (cm^{-1})", "refractive index"}
+            ]
+        ] 
+    ] 
+]
+
+exporter["n", t:{__MaterialParameters}] := With[{
+    data = QuantityMagnitude[#["n"], {1/"Centimeters",1}] &/@ t,
+    names = StringJoin[FileBaseName[#["Tags"]["Filename"][[1]]], ".dat"] &/@ t
+},
+    Then[SystemDialogInputAsync["Directory"], Function[path,
+        If[StringQ[path],
+            Export[FileNameJoin[{path, #[[2]]}], Prepend[#[[1]], {"wavenumber (1/cm)", "n"}]] &/@ Transpose[{data, names}]
+        ]
+    ]];
+]
+
+exporter["n", {t_MaterialParameters}] := With[{data = QuantityMagnitude[t["n"], {1/"Centimeters",1}]},
+    Then[SystemDialogInputAsync["FileSave", {Null, {"ASCII Document" -> {"*.dat"}, "Tabular Formats" -> {"*.csv", "*.tsv"}}}], Function[path,
+        If[StringQ[path],
+            Export[path, Prepend[data, {"wavenumber (1/cm)", "n"}]]
+        ]
+    ]];
+]
+
+
+singleList[f_List] := Length[f] === 1
+
+head[files_List] := head[files, Length[files]]
+
+head[files_, 1] := With[{
+    Title = FileBaseName[files[[1]]["Tags"]["Filename"][[1]]],
+    Thickness = QuantityMagnitude[files[[1]]["Thickness"], "Millimeters"],
+    RefractiveIndex = files[[1]]["n0"],
+    Notes = If[StringLength[#] > 0, #, ""] & @ (files[[1]]["Tags"]["Notes"])
+},
+    <div class="flex flex-row gap-x-4">
+          <div>
+            <h3 class="text-base/7 font-semibold text-gray-900"><Title/></h3>
+            <small class="mt-1 max-w-2xl text-sm/6 text-gray-500">A summary report on the processed TDS spectrum</small>
+            <p class="max-w-2xl text-sm/6 text-gray-500"><Notes/></p>
+            <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Thickness<span class="px-2"><Thickness/></span><span>mm</span></p>
+            <p class="max-w-2xl text-sm/6 text-gray-500">Refractive index<span class="px-2"><RefractiveIndex/></span></p>
+          </div>
+    </div>
+]
+
+head[files_, _] := With[{
+    ListFiles = StringRiffle[FileBaseName[#["Tags"]["Filename"][[1]]] &/@ files, ", "],
+    Thickness = QuantityMagnitude[files[[1]]["Thickness"], "Millimeters"],
+    RefractiveIndex = files[[1]]["n0"],
+    Notes = If[StringLength[#] > 0, #, ""] & @ (files[[1]]["Tags"]["Notes"])
+},
+    <div class="flex flex-row gap-x-4">
+          <div>
+            <h3 class="text-gray-700 uppercase text-md">Summary Report</h3>
+            <p class="max-w-2xl text-sm text-gray-500"><Notes/></p>
+            <small class="mt-1 max-w-2xl text-sm text-gray-500"><ListFiles/></small>
+            <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Thickness<span class="px-2"><Thickness/></span><span>mm</span></p>
+            <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Refractive index<span class="px-2"><RefractiveIndex/></span></p>
+          </div>
+    </div>
+]
+
+svgIcon = <svg class="w-5 h-5" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M924.086857 282.843429l-362.057143 210.724571v415.378286s227.108571-137.728 238.738286-144.384c11.190857-6.436571 26.331429 0.731429 28.891429 17.554285 0.146286 0.731429 1.462857 4.973714 1.462857 5.705143 1.536 18.212571-0.731429 26.770286-12.580572 33.718857l-273.993143 162.742858c-6.948571 3.510857-16.091429 5.485714-30.72-1.755429-7.168-3.218286-424.301714-255.268571-424.301714-255.268571a24.649143 24.649143 0 0 1-11.702857-20.772572V251.611429c0-2.486857-2.413714-25.526857 13.385143-35.913143L517.558857 2.633143a24.137143 24.137143 0 0 1 21.796572 0l426.276571 213.138286c9.508571 4.827429 17.481143 14.628571 16.749714 23.844571a29.622857 29.622857 0 0 1 0.512 5.412571v437.028572c0 16.164571-13.165714 29.257143-29.330285 29.257143h-0.073143a29.403429 29.403429 0 0 1-29.403429-29.330286V282.843429zM495.908571 903.972571V493.714286L141.604571 290.230857v397.677714L495.908571 904.045714zM191.195429 236.251429l337.188571 191.122285 337.042286-191.122285L528.310857 67.876571 191.195429 236.251429z" fill="currentColor" /></svg>;
+
+ButtonWrapper = ImportComponent["Common/UI/ActionButton.wlx"]
+
+Component[files_List] := With[{
+    Views = With[{
+        exporterModule := exporter[#, files],
+        MainWindow = views[#, files],
+        NameView = description[#, files][[1]],
+        ShortInfo =  description[#, files][[2]]
+    },
+    
+    If[MainWindow === Null,
+        ""
+    ,
+        <p>
+            <div class="flex flex-row gap-x-4 mb-2">
+                <div>
+                    <h4 class="text-gray-700 uppercase text-md"><NameView/></h4>
+                    <small class="mt-1 max-w-2xl text-sm text-gray-500"><ShortInfo/></small>
+                </div>
+                <ButtonWrapper Class={"ml-auto"} Action={Hold[exporterModule]} Icon={svgIcon}>Export</ButtonWrapper>
+            </div>
+            <MainWindow/>
+        </p>
+    ]
+    
+    ] &/@ views[All],
+
+    Head = head[files]
+},
+    <div class="w-full h-full px-3 py-2">
+        <Head/>
+        <div class="flex flex-col gap-y-3">
+            <Views/>
+        </div>
+        <div style="height: 5rem"></div>
+    </div>
+]
+
+{Component, views, exporter}

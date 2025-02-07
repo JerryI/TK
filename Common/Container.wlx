@@ -1,0 +1,35 @@
+WindowWrapper = ImportComponent["Wrapper.wlx"];
+
+WindowContainer[process_, notebook_] := With[{
+    controls = CreateUUID[],
+    onload = CreateUUID[],
+    miscControls = CreateUUID[]
+},
+    EventHandler[onload, Function[Null, With[{cli = Global`$Client (*`*)},
+      EventHandler[controls, {
+        "Destroy" -> Function[Null,
+          WebUIClose[cli]
+        ]
+      }];
+    ]]];
+
+    If[TrueQ[process["ValidQ"]],
+      With[{
+        Widget = process["View"][<|"Client" -> Global`$Client(*`*), "GlobalControls" -> controls, "Self" -> process|>]
+      },
+        {
+          <WindowWrapper Controls={controls} Button={process["NeedsButton"]} Title={process["Title"]} State={process["State"]} Progress={process["Progress"]}>
+            <Widget/>
+          </WindowWrapper>
+        ,
+          <WebUIOnLoad Event={onload}/>
+        } // ToStringRiffle
+      ]
+    ,
+      <WindowWrapper Title={"Empty"} State={"Please, close this window"} Progress={1.0}>
+        <small></small>
+      </WindowWrapper>
+    ]
+]
+
+WindowContainer

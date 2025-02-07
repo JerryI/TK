@@ -1,0 +1,41 @@
+
+ContinueButton = ImportComponent["UI/Button.wlx"];
+
+WindowWrapper[Content_, OptionsPattern[]] := With[{
+    UId = CreateUUID[],
+    Title = OptionValue["Title"],
+    State = OptionValue["State"],
+    ButtonWrapper = If[OptionValue["Button"],
+      ContinueButton["Continue", "Event"->OptionValue["Controls"], "Pattern"->"Continue"],
+      ""
+    ],
+    Progress = Round[100.0 OptionValue["Progress"]]
+  },
+  
+  <div class="w-full h-full px-3 py-2">
+    <div class="flex flex-row gap-x-4 ">
+      <div>
+        <h3 class="text-gray-700 uppercase text-md"><Title/></h3>
+          <div id="{UId}-progress" style="transition: width 5s; width: 5%" class="mt-2 bg-teal-600 h-1 rounded-full dark:bg-teal-500"></div>
+        <p id="{UId}-state" class="mt-1 max-w-2xl text-sm text-gray-500"><State/></p>
+      </div>
+      <ButtonWrapper/>
+    </div>
+    
+  
+    <div class="mt-2 h-full">
+      <Content/>
+    </div>
+
+    <script type="module">
+      const bar = document.getElementById('<UId/>-progress');
+      setTimeout(() => {
+        bar.style.width = `<Progress/>%`
+      }, 300);
+    </script>
+  </div>
+]
+
+Options[WindowWrapper] = {"Title" -> "", "MiscControls"->"", "State" -> "", "Controls"->"", "Port" -> "", "Progress" -> 0.1, "Button" -> False}
+
+WindowWrapper

@@ -1,0 +1,215 @@
+
+widget[t_TransmissionObject, threshold_] := With[
+  {
+    ref = FrontInstanceReference[],
+    slider = InputRange[3.14, 3.14 2.0, 0.01, threshold, "Label" -> "Threshold", "Topic" -> {Null, "Default"}]
+  },
+  LeakyModule[
+    {
+      System`phase,
+      System`colors = {},
+      System`name = t["Tags"]["Filename"] // First // FileBaseName,
+      System`point,
+      object,
+      material = t,
+      th = threshold,
+      index = 1,
+      rects = Null,
+      recombine,
+      parts,
+      joints,
+      resetColors,
+      decompose,
+      update,
+      instance
+    },
+
+    instance["Destroy"] := With[{},
+      ClearAll[
+        object,
+        material,
+        th,
+        index,
+        rects,
+        recombine,
+        parts,
+        joints,
+        resetColors,
+        decompose,
+        update,
+        instance       
+      ];
+    ];
+
+    (* Reset colors *)
+    resetColors[i_] := 
+      System`colors = ReplacePart[Table[{1.0, 0, 0}, {Length[parts[[2 ;;, 1]]]}], i -> {0, 1.0, 0}];
+    resetColors[0] := 
+      System`colors = Table[{1.0, 0, 0}, {Length[parts[[2 ;;, 1]]]}];
+    
+    (* Decompose function *)
+    decompose[tr_] := With[
+      {},
+      {recombine, parts, joints} = 
+        TransmissionUnwrap[tr, "Held", "PhaseThreshold" -> th] // capturePhaseTransform;
+      System`colors = 
+        Table[{1.0, 0, 0}, {Max[Length[parts[[2 ;;, 1]]], Length@System`colors]}];
+      If[
+        rects === Null,
+        rects = {
+          Opacity[0.1], 
+          MapIndexed[
+            Function[{item, index}, 
+              With[{i = index[[1]]}, 
+                {RGBColor[System`colors[[i]] // Offload], item}
+              ]
+            ],
+            Rectangle[# + {-2, -1000}, # + {2, 1000}] & /@ parts[[2 ;;, 1]]
+          ]
+        } // (FrontInstanceGroup[]),
+        Delete[rects];
+        rects = {
+          Opacity[0.1], 
+          MapIndexed[
+            Function[{item, index}, 
+              With[{i = index[[1]]}, 
+                {RGBColor[System`colors[[i]] // Offload], item}
+              ]
+            ],
+            Rectangle[# + {-2, -1000}, # + {2, 1000}] & /@ parts[[2 ;;, 1]]
+          ]
+        } // (FrontInstanceGroup[]);
+        FrontSubmit[rects, ref];
+      ]
+    ];
+    
+    (* Update function *)
+    update := With[
+      {},
+      object = recombine[{parts, joints}];
+      System`phase = QuantityMagnitude[object["Phase Features"], {1/"Centimeters", 1}];
+    ];
+
+    instance["Get"] := object;
+    
+    (* Initial decomposition and update *)
+    decompose[t];
+    update;
+
+    instance["NewMaterial"] = Function[newmaterial,
+          material = newmaterial;
+          index = 1;
+          decompose[material];
+          update;
+          System`name = material["Tags"]["Filename"] // First // FileBaseName;
+          FrontSubmit[ZoomAt[1], ref];
+    ];
+    
+    (* Event handlers *)
+    EventHandler[
+      slider, 
+      Function[value,
+        th = value;
+        instance["NewMaterial"][material];
+      ]
+    ];
+    
+    
+    
+    System`point = parts[[index + 1, 1, 1]];
+    
+    instance["View"] = With[{
+      GraphicsWindow = Graphics[
+          {
+            ColorData[97][1], 
+            Line[System`phase // Offload]
+          },
+          Frame -> True, 
+          Axes -> True, 
+          Epilog -> {
+            rects,
+            ref,
+            EventHandler[
+              Null, {
+                "capturekeydown" -> Function[key,
+                  Switch[
+                    key,
+                    
+                    "ArrowLeft",
+                    index--;
+                    If[index < 1, index = 1];
+                    FrontSubmit[
+                      ZoomAt[2, parts[[index + 1, 1]] + {0, Accumulate[2 Pi joints[[All, 2]]][[index]]}], 
+                      ref
+                    ];
+                    resetColors[index];
+                    System`point = parts[[index + 1, 1, 1]];
+                    
+                    ,
+                    
+                    "ArrowRight",
+                    index++;
+                    If[index > Length[joints], index = Length[joints]];
+                    FrontSubmit[
+                      ZoomAt[2, parts[[index + 1, 1]] + {0, Accumulate[2 Pi joints[[All, 2]]][[index]]}], 
+                      ref
+                    ];
+                    resetColors[index];
+                    System`point = parts[[index + 1, 1, 1]];
+                    
+                    ,
+                    
+                    "ArrowUp",
+                    With[{i = index},
+                      joints[[i, 2]] = If[joints[[i, 2]] <= 0, joints[[i, 2]] + 1, joints[[i, 2]]];
+                    ];
+                    update;
+                    
+                    ,
+                    
+                    "ArrowDown",
+                    With[{i = index},
+                      joints[[i, 2]] = If[joints[[i, 2]] >= 0, joints[[i, 2]] - 1, joints[[i, 2]]];
+                    ];
+                    update
+                  ]
+                ]
+              }
+            ]
+          },
+          ImageSize -> Medium,
+          FrameLabel -> {"wavenumber (cm^{-1})", "Radians"}
+        ],
+
+        SliderWindow = slider,
+        TextWindow = TextView[System`point // Offload, "Label" -> "Position"],
+        NameWindow = TextView[System`name // Offload, "Label" -> "Name"]
+          
+      },
+
+      <div class="gap-x-3 flex h-full justify-between pr-2 divide-x flex-row mt-2">
+        <GraphicsWindow/>
+        <div class="flex flex-col gap-y-2 pl-3 mt-5">
+          <SliderWindow/>
+          <TextWindow/>
+          <div></div>
+          <h5 class="text-gray-900">Sample information</h5>
+          <NameWindow/>
+        </div>
+      </div>
+
+    ];
+
+    instance
+  ]
+];
+
+capturePhaseTransform[Hold[callback_[{parts_, joints_}]]] := Module[{
+      myJoints = joints
+},
+      (* modify points *)
+
+      {callback, parts, myJoints}
+];
+
+widget
