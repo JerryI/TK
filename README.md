@@ -26,9 +26,10 @@ A WLJS Notebook app for managing and processing optical time-domain transmission
 ## Screenshots
 
 Preview on the selected project folder
+
 ![](./imgs/dark-2.png)
 
-Summary report
+Automatic reports
 
 ![](./imgs/summary-1.png)
 
@@ -45,3 +46,13 @@ File names matcher
 ![](./imgs/names-1.png)
 
 
+## Technology stack
+
+- Wolfram Engine
+- WLJS Notebook
+- JerryI/TDSTools
+
+## License
+MIT
+
+excluding *ELMo Contextual Word Representations Trained on 1B Word Benchmark*  
