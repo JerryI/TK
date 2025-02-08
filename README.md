@@ -9,7 +9,6 @@ A WLJS Notebook app for managing and processing optical time-domain transmission
 ## Key-features
 
 - __works with normal files, autosaves meta-data__
-- a single dependency (WLJS Notebook)
 - __automatic reference-sample pairs matching__ using ELMo network
 - automatic sorting using a local neural network
 - __semiautomated advanced material parameters extraction__

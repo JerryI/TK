@@ -22,22 +22,22 @@ Component[path_, parser_, opts_] := LeakyModule[{
     UnitsSelection = InputSelect[EventObject[<|"Id"->"controller"|>], {"Microseconds", "Picoseconds", "Nanoseconds", "Femtoseconds"}, "Picoseconds", "Label"->"Time scale", "Topic"->"time"]
 },
 
-    System`stringData = estimateString[parser[path, optsMutable] // Normal]; (*`*)
+    System`stringData = estimateString[parser[path, optsMutable] // QuantityMagnitude]; (*`*)
 
     EventHandler[controller, {
         "range" -> Function[range,
             optsMutable["Header"] = range;
-            System`stringData = estimateString[parser[path, optsMutable] // Normal]; (*`*)
+            System`stringData = estimateString[parser[path, optsMutable] // QuantityMagnitude]; (*`*)
         ],
 
         "format" -> Function[format,
             optsMutable["Format"] = format;
-            System`stringData = estimateString[parser[path, optsMutable] // Normal]; (*`*)
+            System`stringData = estimateString[parser[path, optsMutable] // QuantityMagnitude]; (*`*)
         ],
 
         "time" -> Function[time,
             optsMutable["Units"] = {time, 1};
-            System`stringData = estimateString[parser[path, optsMutable] // Normal]; (*`*)
+            System`stringData = estimateString[parser[path, optsMutable] // QuantityMagnitude]; (*`*)
         ],
 
         "thickness" -> Function[thickness,
