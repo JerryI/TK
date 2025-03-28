@@ -13,10 +13,11 @@ Component[path_, parser_, opts_] := LeakyModule[{
     System`stringData = "" (*`*),
     optsMutable = opts,
     controller = CreateUUID[],
-    params = <|"Thickness" -> Quantity[1, "Millimeters"], "Gain"->1|>,
+    params = <|"Thickness" -> Quantity[1, "Millimeters"], "Gain"->1, "Padding"->0|>,
     object
 }, With[{
     EditorPreview = EditorView[System`stringData // Offload, "ReadOnly"->True] (*`*),
+    ZerosPadding = InputRange[EventObject[<|"Id"->"controller"|>], 0, 4, 1, 0, "Label"->"Baseline padding xN", "Topic"->"padding"],
     HeaderRange = InputRange[EventObject[<|"Id"->"controller"|>], 0, 4, 1, opts["Header"], "Label"->"Header lines", "Topic"->"range"],
     FormatSelect = InputSelect[EventObject[<|"Id"->"controller"|>], {"TSV", "CSV"}, opts["Format"], "Label"->"Format", "Topic"->"format"],
     UnitsSelection = InputSelect[EventObject[<|"Id"->"controller"|>], {"Microseconds", "Picoseconds", "Nanoseconds", "Femtoseconds"}, "Picoseconds", "Label"->"Time scale", "Topic"->"time"]
@@ -28,6 +29,10 @@ Component[path_, parser_, opts_] := LeakyModule[{
         "range" -> Function[range,
             optsMutable["Header"] = range;
             System`stringData = estimateString[parser[path, optsMutable] // QuantityMagnitude]; (*`*)
+        ],
+
+        "padding" -> Function[val,
+            params["Padding"] = val;
         ],
 
         "format" -> Function[format,
@@ -70,6 +75,7 @@ Component[path_, parser_, opts_] := LeakyModule[{
                 <FormatSelect/>
                 <UnitsSelection/>
                 <HeaderRange/>
+                <ZerosPadding/>
             </div>
             <div class="pt-2">
                 <div class="flex flex-col gap-y-2">
@@ -88,7 +94,7 @@ Component[path_, parser_, opts_] := LeakyModule[{
                         <label class="block mb-2 text-sm text-gray-900" for="comments-input">Notes</label>
                         <input type="text" value="" id="comments-input" class="block w-full p-2 py-1 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500"/>
                         <WebUIEventListener Id={"comments-input"} Event={controller} Pattern={"comments"} Type={"change"} />
-                    </div>                    
+                    </div>                  
                 </div>                
             </div>
         </div>

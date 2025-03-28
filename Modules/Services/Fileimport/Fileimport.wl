@@ -46,8 +46,8 @@ forward[process_, props_] :=
     With[{traces = Map[Function[pair,
 
         TransmissionObject[
-            TDTrace[ parse[pair["Sample"], process["ParsingOptions"] ] ],
-            TDTrace[ parse[pair["Reference"], process["ParsingOptions"] ] ],
+            TDTrace[ parse[pair["Sample"], process["ParsingOptions"] ], "PadZeros"->If[process["Padding"] == 0, None, process["Padding"] ] ],
+            TDTrace[ parse[pair["Reference"], process["ParsingOptions"] ], "PadZeros"->If[process["Padding"] == 0, None, process["Padding"] ] ],
             "Thickness" -> process["Thickness"],
             "Gain" -> process["Gain"],
             "Tags" -> <|"Filename" -> {FileNameTake[pair["Sample"] ], FileNameTake[pair["Reference"] ]}, "Notes" -> process["Notes"]|>
@@ -72,6 +72,7 @@ createView[process_][props_] :=  With[{event = CreateUUID[]}, With[{
                 process["ParsingOptions"] = new[[1]];
                 process["Thickness"] = new[[2, "Thickness"]];
                 process["Gain"] = new[[2, "Gain"]];
+                process["Padding"] = new[[2, "Padding"]];
                 process["Notes"] = Lookup[new[[2]], "Notes", ""];
             ] @ Widget["Get"];
             
@@ -96,6 +97,7 @@ importFiles[files_List] := With[{
     p["View"] = createView[p];
     p["Thickness"] = Quantity[1, "Millimeters"];
     p["Gain"] = 1.0;
+    p["Padding"] = 0;
     p["ParsingOptions"] = guessFormat[files[[1, "Sample"]], <|"Format" -> "CSV", "Part" -> {1,2}, "Header" -> 1, "Units" -> {"Picoseconds", 1}|>];
 
     process["ValidQ"] = True;
