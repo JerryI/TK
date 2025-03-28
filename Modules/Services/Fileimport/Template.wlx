@@ -17,10 +17,10 @@ Component[path_, parser_, opts_] := LeakyModule[{
     object
 }, With[{
     EditorPreview = EditorView[System`stringData // Offload, "ReadOnly"->True] (*`*),
-    ZerosPadding = InputRange[EventObject[<|"Id"->"controller"|>], 0, 4, 1, 0, "Label"->"Baseline padding xN", "Topic"->"padding"],
-    HeaderRange = InputRange[EventObject[<|"Id"->"controller"|>], 0, 4, 1, opts["Header"], "Label"->"Header lines", "Topic"->"range"],
-    FormatSelect = InputSelect[EventObject[<|"Id"->"controller"|>], {"TSV", "CSV"}, opts["Format"], "Label"->"Format", "Topic"->"format"],
-    UnitsSelection = InputSelect[EventObject[<|"Id"->"controller"|>], {"Microseconds", "Picoseconds", "Nanoseconds", "Femtoseconds"}, "Picoseconds", "Label"->"Time scale", "Topic"->"time"]
+    ZerosPadding = InputRange[EventObject[<|"Id"->controller|>], 0, 4, 1, 0, "Label"->"Baseline padding xN", "Topic"->"zerospadding"],
+    HeaderRange = InputRange[EventObject[<|"Id"->controller|>], 0, 4, 1, opts["Header"], "Label"->"Header lines", "Topic"->"range"],
+    FormatSelect = InputSelect[EventObject[<|"Id"->controller|>], {"TSV", "CSV"}, opts["Format"], "Label"->"Format", "Topic"->"format"],
+    UnitsSelection = InputSelect[EventObject[<|"Id"->controller|>], {"Microseconds", "Picoseconds", "Nanoseconds", "Femtoseconds"}, "Picoseconds", "Label"->"Time scale", "Topic"->"time"]
 },
 
     System`stringData = estimateString[parser[path, optsMutable] // QuantityMagnitude]; (*`*)
@@ -31,8 +31,8 @@ Component[path_, parser_, opts_] := LeakyModule[{
             System`stringData = estimateString[parser[path, optsMutable] // QuantityMagnitude]; (*`*)
         ],
 
-        "padding" -> Function[val,
-            params["Padding"] = val;
+        "zerospadding" -> Function[zerospadding,
+            params["Padding"] = Round[zerospadding];
         ],
 
         "format" -> Function[format,
