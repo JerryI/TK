@@ -1,7 +1,7 @@
 
 estimateString[p_] := ToString[If[ListQ[p],
-    If[Length[p] > 10,
-        Pane[TableForm[Take[p, 10]], {300, 373}]
+    If[Length[p] > 25,
+        Dataset[Take[p, 25]]
     ,
         Style["Error", Red]
     ]
