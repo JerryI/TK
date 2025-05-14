@@ -1,34 +1,38 @@
 
-estimateString[p_] := ToString[If[ListQ[p],
+estimateDataset[p_] := If[ListQ[p],
     If[Length[p] > 25,
-        Dataset[Take[p, 25]]
+        Take[p, 25]
     ,
-        Style["Error", Red]
+        {"Data cols are less than 25"}
     ]
 ,    
-    Style["Error", Red]
-], StandardForm]
+    {"Parsing error"}
+] // Dataset
 
 Component[path_, parser_, opts_] := LeakyModule[{
-    System`stringData = "" (*`*),
     optsMutable = opts,
+    DataPreview,
+    group,
     controller = CreateUUID[],
     params = <|"Thickness" -> Quantity[1, "Millimeters"], "Gain"->1, "Padding"->0|>,
     object
 }, With[{
-    EditorPreview = EditorView[System`stringData // Offload, "ReadOnly"->True] (*`*),
+    ref = FrontInstanceReference[],
     ZerosPadding = InputRange[EventObject[<|"Id"->controller|>], 0, 4, 1, 0, "Label"->"Baseline padding xN", "Topic"->"zerospadding"],
     HeaderRange = InputRange[EventObject[<|"Id"->controller|>], 0, 4, 1, opts["Header"], "Label"->"Header lines", "Topic"->"range"],
     FormatSelect = InputSelect[EventObject[<|"Id"->controller|>], {"TSV", "CSV"}, opts["Format"], "Label"->"Format", "Topic"->"format"],
     UnitsSelection = InputSelect[EventObject[<|"Id"->controller|>], {"Microseconds", "Picoseconds", "Nanoseconds", "Femtoseconds"}, "Picoseconds", "Label"->"Time scale", "Topic"->"time"]
 },
 
-    System`stringData = estimateString[parser[path, optsMutable] // QuantityMagnitude]; (*`*)
+    group = FrontInstanceGroup[];
+    DataPreview = CreateFrontEndObject[{ref, group[estimateDataset[parser[path, optsMutable] // QuantityMagnitude]]}];
 
     EventHandler[controller, {
         "range" -> Function[range,
             optsMutable["Header"] = range;
-            System`stringData = estimateString[parser[path, optsMutable] // QuantityMagnitude]; (*`*)
+            Delete[group];
+            group = FrontInstanceGroup[];
+            FrontSubmit[group[estimateDataset[parser[path, optsMutable] // QuantityMagnitude]], ref];
         ],
 
         "zerospadding" -> Function[zerospadding,
@@ -37,12 +41,16 @@ Component[path_, parser_, opts_] := LeakyModule[{
 
         "format" -> Function[format,
             optsMutable["Format"] = format;
-            System`stringData = estimateString[parser[path, optsMutable] // QuantityMagnitude]; (*`*)
+            Delete[group];
+            group = FrontInstanceGroup[];
+            FrontSubmit[group[estimateDataset[parser[path, optsMutable] // QuantityMagnitude]], ref];
         ],
 
         "time" -> Function[time,
             optsMutable["Units"] = {time, 1};
-            System`stringData = estimateString[parser[path, optsMutable] // QuantityMagnitude]; (*`*)
+            Delete[group];
+            group = FrontInstanceGroup[];
+            FrontSubmit[group[estimateDataset[parser[path, optsMutable] // QuantityMagnitude]], ref];
         ],
 
         "thickness" -> Function[thickness,
@@ -68,7 +76,7 @@ Component[path_, parser_, opts_] := LeakyModule[{
     object["View"] = With[{}, <div class="gap-x-2 flex h-full justify-between pr-2 divide-x flex-row mt-4">
         <div class="flex flex-col gap-y-2">
             <small>Data preview</small>
-            <EditorPreview/>
+            <DataPreview/>
         </div>
         <div class="gap-y-5 flex flex-col pl-5">
             <div class="flex flex-col gap-y-3">

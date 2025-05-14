@@ -178,7 +178,8 @@ widget[t_TransmissionObject, threshold_] := With[
             ]
           },
           ImageSize -> Medium,
-          FrameLabel -> {"wavenumber (cm^{-1})", "Radians"}
+          FrameLabel -> {"wavenumber (cm^{-1})", "Radians"},
+          "GUI"->False
         ],
 
         SliderWindow = slider,

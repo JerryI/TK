@@ -1,8 +1,8 @@
 sampleList[l_List] := ArrayResample[l, 300, Resampling->"Nearest"] /; Length[l] > 300;
 sampleList[l_List] := l;
 
-generatePreview[t_MaterialParameters, fdci_] := Graphics[{ColorData[97][2], Line[sampleList @ Select[QuantityMagnitude[t["\[Alpha]"], {1/"Centimeters", 1/"Centimeters"}], Function[item, item[[1]] >= fdci[[1]] && item[[1]] <= fdci[[2]] ]] ]}, ImageSize->{350,35}, ImagePadding->None, Axes->{True, False}];
-generatePreview[t_TransmissionObject, fdci_] := Graphics[{ColorData[97][1], Line[sampleList @ Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1/"Centimeters", 1/"Centimeters"}], Function[item, item[[1]] >= fdci[[1]] && item[[1]] <= fdci[[2]] ]] ]}, ImageSize->{350,35}, ImagePadding->None, Axes->{True, False}];
+generatePreview[t_MaterialParameters, fdci_] := Graphics[{ColorData[97][2], Line[sampleList @ Select[QuantityMagnitude[t["\[Alpha]"], {1/"Centimeters", 1/"Centimeters"}], Function[item, item[[1]] >= fdci[[1]] && item[[1]] <= fdci[[2]] ]] ]}, ImageSize->{350,35}, ImagePadding->None, Axes->{True, False}, "GUI"->False, "Controls"->False];
+generatePreview[t_TransmissionObject, fdci_] := Graphics[{ColorData[97][1], Line[sampleList @ Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1/"Centimeters", 1/"Centimeters"}], Function[item, item[[1]] >= fdci[[1]] && item[[1]] <= fdci[[2]] ]] ]}, ImageSize->{350,35}, ImagePadding->None, Axes->{True, False}, "GUI"->False, "Controls"->False];
 
 generatePreview[_, _] := <span class="text-red-300 text-red-400 uppercase">unprocessed</span>;
 
