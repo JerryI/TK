@@ -40,8 +40,8 @@ tableWidget[files_List, Event_String, allowP_:False] := With[{
 
   UId = CreateUUID[]
 },
-<div class="py-2 w-full py-2 align-middle">
-        <table class="w-full divide-y divide-gray-300">
+<div class="py-2 w-full py-2 align-middle overflow-y-scroll overflow-x-scroll h-full">
+        <table class="w-full divide-y h-full divide-gray-300">
           <thead>
             <tr>
               <th scope="col" class="py-3 pl-3 pr-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 sm:pl-0">Filename</th>

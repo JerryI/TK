@@ -69,7 +69,7 @@ views["Transmission", {t_TransmissionObject | t_MaterialParameters}] := With[{
     Graphics[{
         ColorData[97][5], Line[ Select[QuantityMagnitude[t["Transmission"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] // clipT ]
     }, ImageSize->{500,350}, 
-        Frame->True, Axes->True, 
+        Frame->True, Axes->True, "GUI"->False,
         FrameLabel->{"wavenumber (cm^{-1})", "T"}
     ]
 ]
@@ -80,7 +80,7 @@ views["Alpha", {t_TransmissionObject}] := With[{
     Graphics[{
         ColorData[97][2], Line[ Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
     }, ImageSize->{500,350}, 
-        Frame->True, Axes->True, 
+        Frame->True, Axes->True, "GUI"->False,
         FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
     ]
 ]
@@ -102,7 +102,7 @@ views["Alpha", t: {__TransmissionObject}] := With[{
                     Line[ (# + {0, step (index - 1)}) &/@ item]
                 ], dataset]}]
             }, ImageSize->{500,600}, 
-                Frame->True, Axes->True, 
+                Frame->True, Axes->True, "GUI"->False,
                 FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
             ]
         ] 
@@ -126,7 +126,7 @@ views["Transmission", t: ({__TransmissionObject} | {__MaterialParameters})] := W
                     Line[ (# + {0, step (index[[1]] - 1)}) &/@ item]
                 ], dataset]}]
             }, ImageSize->{500,600}, 
-                Frame->True, Axes->True, 
+                Frame->True, Axes->True, "GUI"->False,
                 FrameLabel->{"wavenumber (cm^{-1})", "T"}
             ]
         ] 
@@ -177,7 +177,7 @@ views["Alpha", {t_MaterialParameters}] := With[{
     Graphics[{
         ColorData[97][2], Line[ Select[QuantityMagnitude[t["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
     }, ImageSize->{500,350}, 
-        Frame->True, Axes->True, 
+        Frame->True, Axes->True, "GUI"->False,
         FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
     ]
 ]
@@ -200,7 +200,7 @@ views["Alpha", t: {__MaterialParameters}] := With[{
                     Line[ (# + {0, step (index[[1]] - 1)}) &/@ item]
                 ], dataset]}]
             }, ImageSize->{500,600}, 
-                Frame->True, Axes->True, 
+                Frame->True, Axes->True, "GUI"->False,
                 FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
             ]
         ] 
@@ -236,7 +236,7 @@ views["Alpha", {t_TransmissionObject}] := With[{
     Graphics[{
         ColorData[97][2], Line[ Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
     }, ImageSize->{500,350}, 
-        Frame->True, Axes->True, 
+        Frame->True, Axes->True, "GUI"->False,
         FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
     ]
 ]
@@ -258,7 +258,7 @@ views["Alpha", t: {__TransmissionObject}] := With[{
                     Line[ (# + {0, step (index[[1]] - 1)}) &/@ item]
                 ], dataset]}]
             }, ImageSize->{500,600}, 
-                Frame->True, Axes->True, 
+                Frame->True, Axes->True, "GUI"->False,
                 FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
             ]
         ] 
@@ -293,7 +293,7 @@ views["n", {t_MaterialParameters}] := With[{
     Graphics[{
         ColorData[97][2], Line[ Select[QuantityMagnitude[t["n"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
     }, ImageSize->{500,150}, 
-        Frame->True, Axes->True, 
+        Frame->True, Axes->True, "GUI"->False,
         FrameLabel->{"wavenumber (cm^{-1})", "refractive index"}
     ]
 ]
@@ -316,7 +316,7 @@ views["n", t: {__MaterialParameters}] := With[{
                     Line[ (# + {0, step (index[[1]] - 1)}) &/@ item]
                 ], dataset]}]
             }, ImageSize->{500,400}, 
-                Frame->True, Axes->True, 
+                Frame->True, Axes->True, "GUI"->False,
                 FrameLabel->{"wavenumber (cm^{-1})", "refractive index"}
             ]
         ] 
@@ -404,7 +404,7 @@ Component[files_List] := With[{
                 </div>
                 <ButtonWrapper Class={"ml-auto"} Action={Hold[exporterModule]} Icon={svgIcon}>Export</ButtonWrapper>
             </div>
-            <MainWindow/>
+            <div class="relative"><MainWindow/></div>
         </p>
     ]
     
@@ -412,12 +412,11 @@ Component[files_List] := With[{
 
     Head = head[files]
 },
-    <div class="w-full h-full px-3 py-2">
+    <div class="w-full h-full px-3 py-2 overflow-y-scroll">
         <Head/>
-        <div class="flex flex-col gap-y-3">
+        <div class="flex flex-col gap-y-3 h-full">
             <Views/>
         </div>
-        <div style="height: 5rem"></div>
     </div>
 ]
 
