@@ -10,7 +10,8 @@ BeginPackage["JerryI`Terakitchen`Services`FileImporter`", {
     "CoffeeLiqueur`Extensions`InputsOutputs`",
     "CoffeeLiqueur`Extensions`Communication`",
     "JerryI`TDSTools`Trace`",
-    "JerryI`TDSTools`Transmission`"
+    "JerryI`TDSTools`Transmission`",
+    "CoffeeLiqueur`Extensions`System`"
 }]
 
 
@@ -24,9 +25,13 @@ common = FileNameJoin[{$InputFileName // DirectoryName // ParentDirectory // Par
 
 template = ImportComponent[FileNameJoin[{root, "Template.wlx"}] ];
 
-parse[path_, opts_Association ] := QuantityArray[Select[Drop[Import[path, opts["Format"] ], opts["Header"] ][[All, {1,2} ]], Function[test,
-    NumericQ[test[[1]]] && NumericQ[test[[2]]]
-] ], opts["Units"] ]
+parse[path_, opts_Association ] := With[{
+    s =  Import[path, opts["Format"], HeaderLines->opts["Header"] ][[All, Take[ ToExpression/@Keys[ Select[ KeySortBy[opts["Cols"], ToExpression], #&] ], 2] ]]
+},
+    QuantityArray[Select[Drop[s, 0 ][[All, {1,2} ]], Function[test,
+        NumericQ[test[[1]]] && NumericQ[test[[2]]]
+    ] ], opts["Units"] ]
+]
 
 guessFormat[path_, l_Association ] := Module[{
     opts = l
@@ -59,6 +64,12 @@ forward[process_, props_] :=
         Delete[process];
     ]
 
+notValidQ[process_, props_] := With[{files = Join[process["Files"][[All, "Sample"]], process["Files"][[All, "Reference"]]]},
+    SelectFirst[files, Function[f,
+        !With[{q = QuantityMagnitude[parse[f, process["ParsingOptions"] ], {"Picoseconds", 1}]}, MatchQ[q, {{_?NumberQ, _?NumberQ}..}] && Length[q] > 100]
+    ] ]
+]
+
 createView[process_][props_] :=  With[{event = CreateUUID[]}, With[{
     Widget = template[process["Files"][[1, "Sample"]], parse, process["ParsingOptions"] ],
     controls = props["GlobalControls"],
@@ -66,6 +77,9 @@ createView[process_][props_] :=  With[{event = CreateUUID[]}, With[{
 },
     EventHandler[controls, {
         "Continue" -> Function[Null,
+
+
+
             EventFire[controls, "StartLoader", True];
 
             Function[new,
@@ -75,6 +89,14 @@ createView[process_][props_] :=  With[{event = CreateUUID[]}, With[{
                 process["Padding"] = new[[2, "Padding"]];
                 process["Notes"] = Lookup[new[[2]], "Notes", ""];
             ] @ Widget["Get"];
+
+            With[{v = notValidQ[process, props]},
+                If[v =!= Missing["NotFound"], 
+                    EventFire[controls, "StopLoader", True];
+                    Then[ChoiceDialogAsync["Input data is not valid at "<>FileNameTake[v] ], Beep];
+                    Return[];
+                ];
+            ];
             
             forward[process, props];
             Widget["Destroy"];
@@ -87,7 +109,7 @@ createView[process_][props_] :=  With[{event = CreateUUID[]}, With[{
 ] ]
 
 importFiles[files_List] := With[{
-    p = jtp`processObject["Title" -> "Import wizard", "NeedsButton" -> True, "State" -> "Check pairs the units and the content", "NeedsWindow"->True ]
+    p = jtp`processObject["Title" -> "Import wizard", "NeedsButton" -> True, "State" -> "Check units and select two columns", "NeedsWindow"->True ]
 },
     If[Length[files] == 0, 
         EventFire[p["Promise"], Reject, "Files are missing"];
@@ -98,7 +120,7 @@ importFiles[files_List] := With[{
     p["Thickness"] = Quantity[1, "Millimeters"];
     p["Gain"] = 1.0;
     p["Padding"] = 0;
-    p["ParsingOptions"] = guessFormat[files[[1, "Sample"]], <|"Format" -> "CSV", "Part" -> {1,2}, "Header" -> 1, "Units" -> {"Picoseconds", 1}|>];
+    p["ParsingOptions"] = guessFormat[files[[1, "Sample"]], <|"Format" -> "CSV", "Cols"-><|"1"->True, "2"->True|>, "Part" -> {1,2}, "Header" -> 1, "Units" -> {"Picoseconds", 1}|>];
 
     process["ValidQ"] = True;
 
