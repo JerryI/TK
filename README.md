@@ -7,7 +7,7 @@ TeraKitchen is a WLJS Notebook application designed for automated analysis of op
 
 ![](./imgs/landing-back.png)
 
-A WLJS Notebook app for managing and processing optical __time-domain transmission spectra__
+A WLJS Notebook app for managing and processing optical __time-domain transmission spectra__ based on __the open-source library__ [wl-tds-tools](https://github.com/JerryI/wl-tds-tools). 
 
 ## Tested on
 - Topica TeraFlash (2016 - Now)
@@ -289,11 +289,11 @@ This is a litte more difficult, since this is a very thin sample. Try:
 
 It does not need a phase cure.
 
-## Technology stack
 
-- Wolfram Engine
-- WLJS Notebook
-- JerryI/TDSTools
+## Acknowledgments 💛
+The work of K.V. (@JerryI) was supported by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation)-TRR 360-492547816
+
+I am deeply grateful to Dr. Joachim Deisenhofer for countless discussions, endless support, and deep insights into THz spectroscopy.
 
 ## License
 __MIT__
