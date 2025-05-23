@@ -69,7 +69,7 @@ applyPatch[{x_, x_}] := {1.5 x, 0.9 x}
 applyPatch[{x_, y_}] := {x, y}
 
 refWidget[base_, c_, OptionsPattern[] ] := Module[{
-  System`gridColors, connections, board,
+  gridColors, connections, board,
   object
 }, With[{
 
@@ -91,13 +91,13 @@ refWidget[base_, c_, OptionsPattern[] ] := Module[{
 
   connections = c;
 
-  System`gridColors = Table[
+  gridColors = Table[
     getColor[color, connections[[i,j]], minMax]
   , {i, 1, ls}, {j, 1, lr}];
   
   object["View"] = Graphics[{    
     board = Table[With[{i=i, j=j}, {
-      RGBColor[System`gridColors[[i]][[j]]] // Offload,
+      RGBColor[gridColors[[i]][[j]]] // Offload,
       Rectangle[{i,j} - {0.4,0.4}, {i,j} + {0.4,0.4}]
     }], {i, 1, ls}, {j, 1, lr}],
 
@@ -115,7 +115,7 @@ refWidget[base_, c_, OptionsPattern[] ] := Module[{
                 minMax[[2]]
             ];   
             
-            System`gridColors = Table[
+            gridColors = Table[
               getColor[color, connections[[ii,jj]], minMax]
             , {ii, 1, ls}, {jj, 1, lr}];
 

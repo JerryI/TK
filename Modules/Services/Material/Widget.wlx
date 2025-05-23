@@ -1,8 +1,8 @@
 widget[initial_TransmissionObject, OptionsPattern[]] := Module[{
-  System`alpha,
-  System`n,
-  System`rawAlpha,
-  System`name = "",
+  alpha,
+  n,
+  rawAlpha,
+  name = "",
   transmission,
   parameters,
   oldset = Null,
@@ -18,11 +18,11 @@ object["Next"] = Function[m,
     ,
         transmission = m;
     ];
-    System`name = FileBaseName[m["Tags"]["Filename"][[1]]];
+    name = FileBaseName[m["Tags"]["Filename"][[1]]];
     fdci = QuantityMagnitude[#, 1/"Centimeters"] &/@ m["FDCI"];
     fdci = {fdci[[1]] / 2.0, 2.0 fdci[[2]] };
     material = MaterialParameters[transmission, "Target"->"GPU", "FabryPerotCancellation"->False];
-    System`rawAlpha = Select[QuantityMagnitude[material["\[Alpha]"], {1/"Centimeters", 1/"Centimeters"}], (#[[1]] >= fdci[[1]] && #[[1]] <= fdci[[2]])&];
+    rawAlpha = Select[QuantityMagnitude[material["\[Alpha]"], {1/"Centimeters", 1/"Centimeters"}], (#[[1]] >= fdci[[1]] && #[[1]] <= fdci[[2]])&];
     update[oldset];
 ];
 
@@ -32,8 +32,8 @@ update = Function[set,
         oldset = set;
         transmission = Append[transmission, {"Thickness"->set["Thickness"], "Gain"->set["Gain"], "PhaseShift"->set["PhaseShift"]}];
         material = MaterialParameters[transmission, "Target"->"GPU"];
-        System`alpha = Select[QuantityMagnitude[material["\[Alpha]"], {1/"Centimeters", 1/"Centimeters"}], (#[[1]] >= fdci[[1]] && #[[1]] <= fdci[[2]])&];
-        System`n = Select[QuantityMagnitude[material["n"], {1/"Centimeters", 1}], (#[[1]] >= fdci[[1]] && #[[1]] <= fdci[[2]])&];
+        alpha = Select[QuantityMagnitude[material["\[Alpha]"], {1/"Centimeters", 1/"Centimeters"}], (#[[1]] >= fdci[[1]] && #[[1]] <= fdci[[2]])&];
+        n = Select[QuantityMagnitude[material["n"], {1/"Centimeters", 1}], (#[[1]] >= fdci[[1]] && #[[1]] <= fdci[[2]])&];
 ];
 
 parameters = <|"Thickness" -> OptionValue["Thickness"], "Gain"->OptionValue["Gain"], "PhaseShift"->OptionValue["PhaseShift"]|>;
@@ -87,7 +87,7 @@ With[{
         InputRange[ev, t 0.5, t 1.5, t / 150.0, t, "Label"->"Thickness (mm)", "Topic"->"Thickness"]
       ],
       Gain = InputRange[ev, 0.2, 1.8, 0.05, parameters["Gain"], "Label"->"Gain", "Topic"->"Gain"],
-      Filename = TextView[System`name // Offload]
+      Filename = TextView[name // Offload]
     },
       <div class="flex flex-col gap-y-2 pl-3 mt-5">
         <PhaseShift/>
@@ -101,11 +101,11 @@ With[{
 
     GraphicsWindow = With[{
       Graphics1 = Graphics[{
-        {ColorData[97][1], Opacity[0.5], Line[System`rawAlpha // Offload]},
-        ColorData[97][2], Line[System`alpha // Offload]
+        {ColorData[97][1], Opacity[0.5], Line[rawAlpha // Offload]},
+        ColorData[97][2], Line[alpha // Offload]
       }, ImageSize->{500,350}, Frame->True, Axes->True, "GUI"->False, FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}],
       Graphics2 = Graphics[{
-        ColorData[97][3], Line[System`n // Offload]
+        ColorData[97][3], Line[n // Offload]
       }, ImageSize->{500,200}, Frame->True, Axes->True, "GUI"->False, FrameLabel->{"wavenumber (cm^{-1})", "n"}]  
     }, 
 
