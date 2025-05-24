@@ -2,3 +2,4 @@ wl_packages
 wl_packages_lock.wl
 .wl_timestamp
 .github
+.DS_Store

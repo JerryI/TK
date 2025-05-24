@@ -118,9 +118,19 @@ widget[t_TransmissionObject, threshold_] := With[
     
     point = parts[[index + 1, 1, 1]];
     
-    instance["View"] = With[{
+    instance["View"] = Module[{kramers}, 
+
+     kramers = QuantityMagnitude[object["Kramers-Kronig n"], {1/"Centimeters", 1}];
+     kramers = Select[kramers, Function[item, NumberQ[item[[1]]] && NumberQ[item[[2]]] ] ];
+     If[Length[kramers] > 0, With[{L = QuantityMagnitude[object["Thickness"], "Centimeters"], n0 = object["n0"]},
+        kramers = Map[{#[[1]], 6.270 L (#[[2]] - n0) #[[1]]}&, kramers];
+     ] ];
+
+     With[{
       GraphicsWindow = Graphics[
           {
+            {ColorData[97][3], Opacity[0.5],
+            Line[kramers]},
             ColorData[97][1], 
             Line[phase // Offload]
           },
@@ -202,7 +212,7 @@ widget[t_TransmissionObject, threshold_] := With[
         </div>
       </div>
 
-    ];
+    ] ];
 
     instance
   ]

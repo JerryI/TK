@@ -1,6 +1,7 @@
 # TeraKitchen: A WLJS Application for Automated TDS-THz Spectroscopy Analysis
 TeraKitchen is a WLJS Notebook application designed for automated analysis of optical time-domain transmission spectra. It features ~~AI-assisted~~ ML based reference/sample matching, Fabry–Pérot deconvolution, interactive phase unwrapping, and material parameter extraction—all integrated into a file-based workflow with automated reporting and metadata management.
 
+![](./imgs/title.gif)
 
 *University of Augsburg, EPV*
 *Developer: kirill.vasin@uni-a.de*
@@ -173,6 +174,8 @@ This window allows you to configure the file parser and provide minimum necessar
 This step attempts to fix phase jumps using a basic threshold filter, then allows you to manually adjust each breaking point.
 
 ![Phase jump detection](./imgs/tk-5.png)
+
+> NOTE: If possible it will show an estimated phase (pale green colored) using Kramers-Kronig relation on the background for your eyes as a guideline. It may deviate, since it is a very limited approximation.
 
 Click on the left window to enter manual mode:
 
