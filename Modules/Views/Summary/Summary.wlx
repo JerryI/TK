@@ -161,7 +161,7 @@ exporter["Alpha", t:{__TransmissionObject}] := With[{
 ]
 
 exporter["Transmission", t:({__TransmissionObject} | {__MaterialParameters})] := With[{
-    data = QuantityMagnitude[#["Approximated \[Alpha]"], {1/"Centimeters",1}] &/@ t,
+    data = QuantityMagnitude[#["Transmission"], {1/"Centimeters",1}] &/@ t,
     names = StringJoin[FileBaseName[#["Tags"]["Filename"][[1]]], ".dat"] &/@ t
 },
     Then[SystemDialogInputAsync["Directory"], Function[path,
