@@ -1,4 +1,7 @@
 # TeraKitchen: A WLJS Application for Automated TDS-THz Spectroscopy Analysis
+
+[![DOI](https://zenodo.org/badge/928929126.svg)](https://doi.org/10.5281/zenodo.15536441)
+
 TeraKitchen is a [WLJS Notebook application](htpps://wljs.io) designed for automated analysis of optical time-domain transmission spectra. It features ~~AI-assisted~~ ML based reference/sample matching, Fabry–Pérot deconvolution, interactive phase unwrapping, and material parameter extraction—all integrated into a file-based workflow with automated reporting and metadata management.
 
 ![](./imgs/title.gif)
