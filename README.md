@@ -29,6 +29,7 @@ and many many dielectric, semiconductor samples ranging from 50um up to 2mm in t
 - __interactive phase unwrapping__
 - __automated reports__
 - easy exports to ASCII format
+- *no assumptions are made on the nature of the excitations* __works for both magnetic- and electric-dipole transitions__
 
 ## How to run
 1. Install [WLJS Notebook](https://wljs.io/)
@@ -67,12 +68,12 @@ This tool was developed to automate much of this process for Time-Domain experim
 
 **Key Features:**
 
-- **File name decoding**: Automatically matches reference and sample pairs using an ElMO neural network.
+- **File name decoding**: Automatically matches reference and sample pairs using an ElMO network.
 - **Batch processing**: Computes transmission data for all selected files automatically.
 - **Assisted phase unwrapping**: Optical phase is typically wrapped between -π and π, which is not usable for extracting optical parameters. This tool can automatically unwrap the phase and allows manual correction of excitonic positions (usually where phase breaks occur), if needed.
 - **Accurate absorption coefficient extraction & Fabry–Perot deconvolution**: Offers an interactive process to iteratively correct thickness and gain, solving Fresnel equations and extracting refractive index \( n \), extinction coefficient \( k \), or complex \( \tilde{n} \).
 - **Summary reporting**: Stacks and plots spectra (automatically sorted using a neural network) of optical conductivity, transmission, and absorption. Metadata is saved in the experiment folder.
-- **File-based workflow**: Functions as a file browser. It recognizes processed spectra within a folder, displays previews, supports data modification, and works entirely offline by storing a `._TK_store` file in each experiment folder.
+- **File-based workflow**: Functions as a file browser. It recognizes processed spectra within a folder, displays previews, supports data modification, and works entirely offline by storing a `.TK_store` file in each experiment folder.
 
 ---
 
@@ -86,10 +87,16 @@ MySample_4K_0T_ref.csv
 ...
 ```
 
-Each file should contain two or more columns:
+Each file should contain 2+ columns:
 
+*csv*
 ```
 time axis; y-axis
+```
+
+*tsv*
+```
+time axis    y-axis
 ```
 
 You can select the appropriate units for the time axis in the import wizard window.
@@ -97,8 +104,8 @@ You can select the appropriate units for the time axis in the import wizard wind
 ## Tutorials
 In this guide, you will learn how to process and manage your spectral data. There are two general approaches to processing:
 
-- **Folder-based processing**: everything, that *Quick anonymous processing* does, but the metadata is stored within the same folder as your files.
 - **Quick anonymous processing**: This method uploads your files, processes them, displays a summary (from which you can export the necessary ASCII data), and then deletes the results.
+- **Folder-based processing**: everything, that *Quick anonymous processing* does, but the metadata is stored within the same folder as your files.
 
 Here we will focuses on the **first one**
 
@@ -106,7 +113,7 @@ Here we will focuses on the **first one**
 
 ### Process Raw Time-Traces
 
-**Set the folder** containing your `CSV`, `TSV`, or `DAT` ASCII-like files measured for the **reference** and the **sample** (they must be in separate pairs).
+**Set the folder** containing your `CSV`, `TSV`, or `DAT` ASCII-like files measured for the **reference** and the **sample** (they must be in separate files).
 
 #### Typical Folder Structure:
 
@@ -134,6 +141,9 @@ Here is the first window you will see:
 ![Summary window](./imgs/tk-2.png)
 
 > 💡 **Note:** If you have already processed the data before, you can access the final spectra from this window. See the **Revisit** section.
+
+> Use `Ctrl` / `Cmd` and `Shift` to select multiple files to process
+> Double-click on the item to see the processed data. See the **Revisit** section.
 
 ---
 
@@ -180,7 +190,7 @@ This step attempts to fix phase jumps using a basic threshold filter, then allow
 
 > NOTE: If possible it will show an estimated phase (pale green colored) using Kramers-Kronig relation on the background for your eyes as a guideline. It may deviate, since it is a very limited approximation.
 
-Click on the left window to enter manual mode:
+__Click__ on the left window to enter manual mode:
 
 - **LEFT/RIGHT arrows**: Navigate between jump points.
 - **UP/DOWN arrows**: Correct the phase jump by adding or subtracting \(2\pi\) from the rest of the curve. You may press multiple times, but the program limits the total phase correction to ±\(2\pi\), so you don’t need to worry about overcorrecting.
@@ -261,7 +271,7 @@ Press `Browse`:
 
 ![Browse button](./imgs/tk-1.png)
 
-Then select the folder containing the time-traces you previously processed:
+Then select (use `Shift` to select the range of files or `Ctrl/Cmd` to select individual items) the folder containing the time-traces you previously processed:
 
 ![Folder selection](./imgs/tk-18.png)
 
