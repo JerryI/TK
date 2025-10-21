@@ -188,6 +188,7 @@ widget[t_TransmissionObject, threshold_] := With[
             ]
           },
           ImageSize -> Medium,
+          AspectRatio -> 1.2,
           FrameLabel -> {"wavenumber (cm^{-1})", "Radians"},
           "GUI"->False
         ],
