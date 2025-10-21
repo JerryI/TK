@@ -33,8 +33,9 @@ and many many dielectric, semiconductor samples ranging from 50um up to 2mm in t
 
 ## How to run
 1. Install [WLJS Notebook](https://wljs.io/)
-2. Download this repository (clone or get `Source` from the releases page)
-3. Start `TK.wlw`
+2. Download this repository or get `ZIP` from the releases (right sidebar)
+3. Extract it
+4. Start `TK.wlw`
 
 ## Screenshots
 
