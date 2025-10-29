@@ -179,7 +179,7 @@ Delete[process];\n      \n        process = phaseUnwrap[results[\"Files\"]]; \
 \n        process[\"Progress\"] = 0.7;\n\n        Then[process[\"Promise\"], \
 Function[r,\n          process[\"Files\"] = .;\n          \
 Delete[process];\n\n          Then[ChoiceDialogAsync[\"Apply high-accuracy \
-material parameters extraction procedure\"], Function[choise,\n            \
+material parameters extraction procedure\", \"Notebook\"->notebook], Function[choise,\n            \
 If[choise,\n            \n              process = \
 materialParams[r[\"Files\"]];\n              process[\"Progress\"] = \
 0.85;\n\n              Then[process[\"Promise\"], Function[resultMaterial, \n \

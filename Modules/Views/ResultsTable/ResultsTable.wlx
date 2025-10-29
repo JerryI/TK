@@ -88,10 +88,10 @@ tableWidget[files_List, Event_String, allowP_:False] := With[{
           const toggleSelection = (index) => {
             if (selectedRows.has(index)) {
               selectedRows.delete(index);
-              trs[index].classList.remove('bg-teal-500/15');
+              trs[index].classList.remove('bg-sys-25');
             } else {
               selectedRows.add(index);
-              trs[index].classList.add('bg-teal-500/15');
+              trs[index].classList.add('bg-sys-25');
             }
           };
 
@@ -100,13 +100,13 @@ tableWidget[files_List, Event_String, allowP_:False] := With[{
             selectedRows.clear();
             for (let i = from; i <= to; i++) {
               selectedRows.add(i);
-              trs[i].classList.add('bg-teal-500/15');
+              trs[i].classList.add('bg-sys-25');
             }
           };
 
           const updateSelectionUI = () => {
             trs.forEach((tr, index) => {
-              tr.classList.toggle('bg-teal-500/15', selectedRows.has(index));
+              tr.classList.toggle('bg-sys-25', selectedRows.has(index));
             });
             if (selectedRows.size === 0) {
               tools.classList.add('hidden');
