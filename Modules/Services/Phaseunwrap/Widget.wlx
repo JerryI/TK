@@ -208,7 +208,7 @@ widget[t_TransmissionObject, threshold_] := With[
           <div>
             <h5 class="text-gray-900">Sample information</h5>
             <NameWindow/>
-            <p class="text-sm text-gray-900 mt-auto py-2">Click on the left window and use <b>arrow keys</b> to cure phase jumps</p>
+            <p class="text-sm text-gray-900 mt-auto py-2">Click on the left window and use <b>arrow keys</b> to corrent phase jumps</p>
           </div>
         </div>
       </div>

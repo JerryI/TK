@@ -31,7 +31,7 @@ groupFilesByTags[files_] := With[{groups = GroupBy[ <|"Tags" -> StringSplit[File
   ]
 ];
 
-sortFileNames[ l: List[__String] ] := With[{
+(*sortFileNames[ l: List[__String] ] := With[{
   tag2vec = generator[(StringSplit[#, "_"|"."]& /@ l)  // Flatten // DeleteDuplicates]
 },
   With[{
@@ -40,7 +40,9 @@ sortFileNames[ l: List[__String] ] := With[{
     RotateLeft[tour,  - Position[tour, 1]//First ] // Reverse
   ]
   
-]
+]*)
+
+sortFileNames[ l: List[__String] ] := Ordering[Map[FromDigits, Select[Characters[#], DigitQ]] &/@ l]
 
 
 generator[words_] := With[{},
