@@ -2,7 +2,9 @@ BeginPackage["JerryI`Terakitchen`Utils`Filenames`", {
     "JerryI`Misc`Events`",
     "JerryI`Misc`Events`Promise`",
     "JerryI`Misc`WLJS`Transport`",
-    "JerryI`Misc`Language`"
+    "JerryI`Misc`Language`",
+    "JerryI`WLX`",
+    "JerryI`WLX`Importer`"
 }]
 
 groupFilesByTags;
@@ -13,7 +15,11 @@ refWidget;
 
 Begin["`Private`"]
 
+tableTemplate = ImportComponent[FileNameJoin[{$InputFileName // DirectoryName, "Filenames.wlx"}] ];
+
+
 Print["Loading neural net..."];
+
 
 (* ELMo Contextual Word Representations Trained on 1B Word Benchmark *)
 (* function by Vitaliy Kaurov *)
@@ -93,40 +99,23 @@ refWidget[base_, c_, OptionsPattern[] ] := Module[{
 
   connections = c;
 
-  gridColors = Table[
-    getColor[color, connections[[i,j]], minMax]
-  , {i, 1, ls}, {j, 1, lr}];
-  
-  object["View"] = Graphics[{    
-    board = Table[With[{i=i, j=j}, {
-      RGBColor[gridColors[[i]][[j]]] // Offload,
-      Rectangle[{i,j} - {0.4,0.4}, {i,j} + {0.4,0.4}]
-    }], {i, 1, ls}, {j, 1, lr}],
+  (* Graphics[] was replaced with HTML radio buttons component *)
+  With[{
+    refs = Table[StringReplace[FileBaseName[base[["Reference", i, "Path"]]], "_"->"_"], {i, 1, lr}],
+    smpls = Table[StringReplace[FileBaseName[base[["Sample", i, "Path"]]], "_"->"_"], {i, 1, ls}]
+  }, {
+    initialConnections = Association[Table[smpls[[i]] -> SortBy[Transpose[{refs, -connections[[i]]}], Last][[-1,1]], {i, 1, ls}] ]
+  },
 
-    Table[Text[StringReplace[FileBaseName[base[["Reference", i, "Path"]]], "_"->"_"], {0.5, i}, {1,0}], {i, 1, lr}],
-
-    Table[Rotate[Text[StringReplace[FileBaseName[base[["Sample", i, "Path"]]], "_"->"_"], {i, lr + 0.5}, {1,0}], 90Degree, {i, lr + 0.5}], {i, 1, ls}],
-
-    EventHandler[Null, {
-      "click" -> Function[xy,
-        Do[
-          If[RegionMember[board[[i,j,2]], xy], 
-            connections[[i,j]] = If[
-              connections[[i,j]] > Mean[minMax], 
-                minMax[[1]], 
-                minMax[[2]]
-            ];   
-            
-            gridColors = Table[
-              getColor[color, connections[[ii,jj]], minMax]
-            , {ii, 1, ls}, {jj, 1, lr}];
-
-            Break[];
-          ];
-        , {i, 1, ls}, {j, 1, lr}]        
+    object["View"] = tableTemplate[smpls, refs, initialConnections, Function[update,
+      With[{
+        r = Position[refs,  update[[1]]][[1,1]],
+        s = Position[smpls, update[[2]]][[1,1]]
+      },
+        connections[[s]] = Table[-KroneckerDelta[i, r], {i, 1, Length[refs]}];
       ]
-    }]
-  }, "GUI"->False, ImageSize->OptionValue[ImageSize], PlotRange->{{-2, ls + 1}, {-1, lr + 2}}];
+    ] ];
+  ];
 
   object
 

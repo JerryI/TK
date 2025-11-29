@@ -1,0 +1,114 @@
+Component[samples_List, references_List, connectivity_Association, updater_] := With[{
+ UId = CreateUUID[]
+},
+{
+    THead = Table[
+        <th class="t-label-scroll"><Item/></th>
+    , {Item, Join[{""}, references]}],
+
+    TBody = Table[
+        With[{
+            References = Table[
+                If[connectivity[Item] === ref,
+                    <td><input type="radio" name="{URLEncode[Item]}" value="{URLEncode[ref]}" checked="true"/></td>
+                ,
+                    <td><input type="radio" name="{URLEncode[Item]}" value="{URLEncode[ref]}"/></td>
+                ]
+            , {ref, references}]
+        },
+
+            <tr>
+                <th><Item/></th>
+                <References/>
+            </tr>
+        ]
+    , {Item, samples}]
+},
+
+    EventHandler[UId, updater];
+
+    <div class="t-wrapper">
+      <table class="t-table">
+        <style>
+          .t-wrapper {
+            width: 100%;
+            height: 100%;
+            overflow: auto;           /* scroll here */
+          }
+
+          .t-table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+
+          .t-label-scroll {
+            text-wrap: nowrap;
+            overflow-x: scroll;
+            max-width: 12rem;
+            font-size: small;
+          }
+
+          .t-table-b td {
+            padding-left: 1rem;
+            padding-right: 1rem;
+          }
+          .t-table-b tr:hover {
+            background-color: var(--system-accent-color-25);
+          }
+
+
+          /* common header cell styling */
+          .t-table-b th,
+          .t-table-h th {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            font-weight: normal;
+            font-size: small;
+            background-color: rgb(249 250 251);
+          }
+
+          /* sticky column headers (top row) */
+          .t-table-h th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+          }
+
+          /* sticky row headers (first column in tbody) */
+          .t-table-b th {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+          }
+
+          /* top-left corner cell (if there is one) */
+          .t-table-h th:first-child {
+            left: 0;
+            z-index: 3;
+          }
+        </style>
+
+        <thead class="t-table-h">
+          <tr>
+            <THead/>
+          </tr>
+        </thead>
+        <tbody id="{UId}" class="t-table-b text-left">
+          <TBody/>
+        </tbody>
+
+        <script type="module">
+          const body = document.getElementById('<UId/>');
+          const radio = body.getElementsByTagName('input');
+          for (let i = 0; i < radio.length; i++) {
+            radio[i].addEventListener('change', () => {
+              console.log([radio[i].value, radio[i].name]);
+              server.kernel.io.fire('<UId/>', [radio[i].value, radio[i].name]);
+            });
+          }
+        </script>
+      </table>
+    </div>    
+];
+
+Component
