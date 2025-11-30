@@ -27,13 +27,13 @@ Component[samples_List, references_List, connectivity_Association, updater_] := 
 
     EventHandler[UId, updater];
 
-    <div class="t-wrapper">
+    <div class="t-wrapper rounded">
       <table class="t-table">
         <style>
           .t-wrapper {
             width: 100%;
-            height: 100%;
-            overflow: auto;           /* scroll here */
+            height: calc(100% - 4.5rem);
+            overflow: scroll;           /* scroll here */
           }
 
           .t-table {
