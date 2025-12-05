@@ -1,126 +1,126 @@
-<|"Notebook" -> <|"Controller" -> "75265947-cf93-4b41-870c-b28f250e5457", 
+<|"Notebook" -> <|"Controller" -> "19b5cdbb-1ce6-4ae0-bd09-b51cb0f86fdb", 
    "FocusedCell" -> CoffeeLiqueur`Notebook`Cells`CellObj[
-     CoffeeLiqueur`Notebook`Cells`CellObj`$297], 
+     CoffeeLiqueur`Notebook`Cells`CellObj`$403], 
    "MessangerChannel" -> Messanger, "ModalsChannel" -> 
-    "0a3bbf3b-1711-4dad-946b-65fdd9da0fd1", "Objects" -> <||>, 
+    "fe33db2c-e9f8-4a87-b870-d59690bafd1f", "Objects" -> <||>, 
    "Path" -> "/users/kirill/Github/TK/TK.wln", 
    "PublicFields" -> {"Properties"}, "Symbols" -> <||>, 
    "TOC" -> {CoffeeLiqueur`Extensions`TOC`Private`heading[1, "Terakitchen", 
       CoffeeLiqueur`Notebook`Cells`CellObj[
-       CoffeeLiqueur`Notebook`Cells`CellObj`$221]], 
+       CoffeeLiqueur`Notebook`Cells`CellObj`$386]], 
      CoffeeLiqueur`Extensions`TOC`Private`heading[2, "Import core libraries", 
       CoffeeLiqueur`Notebook`Cells`CellObj[
-       CoffeeLiqueur`Notebook`Cells`CellObj`$221]], 
+       CoffeeLiqueur`Notebook`Cells`CellObj`$386]], 
      CoffeeLiqueur`Extensions`TOC`Private`heading[2, 
       "Import 3rd party libraries", CoffeeLiqueur`Notebook`Cells`CellObj[
-       CoffeeLiqueur`Notebook`Cells`CellObj`$225]], 
+       CoffeeLiqueur`Notebook`Cells`CellObj`$390]], 
      CoffeeLiqueur`Extensions`TOC`Private`heading[2, "Import WLX components", 
       CoffeeLiqueur`Notebook`Cells`CellObj[
-       CoffeeLiqueur`Notebook`Cells`CellObj`$233]], 
+       CoffeeLiqueur`Notebook`Cells`CellObj`$399]], 
      CoffeeLiqueur`Extensions`TOC`Private`heading[2, "App logic", 
       CoffeeLiqueur`Notebook`Cells`CellObj[
-       CoffeeLiqueur`Notebook`Cells`CellObj`$237]], 
+       CoffeeLiqueur`Notebook`Cells`CellObj`$402]], 
      CoffeeLiqueur`Extensions`TOC`Private`heading[3, 
       "Data processing pipeline", CoffeeLiqueur`Notebook`Cells`CellObj[
-       CoffeeLiqueur`Notebook`Cells`CellObj`$237]], 
+       CoffeeLiqueur`Notebook`Cells`CellObj`$402]], 
      CoffeeLiqueur`Extensions`TOC`Private`heading[2, 
       "Supplimentary pipleline", CoffeeLiqueur`Notebook`Cells`CellObj[
-       CoffeeLiqueur`Notebook`Cells`CellObj`$242]], 
+       CoffeeLiqueur`Notebook`Cells`CellObj`$407]], 
      CoffeeLiqueur`Extensions`TOC`Private`heading[2, "Landing Window", 
       CoffeeLiqueur`Notebook`Cells`CellObj[
-       CoffeeLiqueur`Notebook`Cells`CellObj`$245]]}|>, 
+       CoffeeLiqueur`Notebook`Cells`CellObj`$410]]}|>, 
  "Cells" -> {<|"Data" -> ".md\n# Terakitchen\n__Application for processing \
 and managing TDS transmission spectroscopy data__\n\n<br/>\n\n## Import core \
 libraries\nUsed for template engine WLX", "Display" -> "codemirror", 
-    "Hash" -> "eb10acb9-1dd2-4df6-8efb-61ab97df881b", "Invisible" -> False, 
+    "Hash" -> "505d6613-1461-470e-a1f3-1c01e5cb3e72", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <|"Hidden" -> True|>, 
     "PublicFields" -> {"Properties"}, "State" -> "Idle", "Type" -> "Input", 
-    "UID" -> Null, "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "UID" -> Null, "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> "# Terakitchen\n__Application for processing and managing TDS \
 transmission spectroscopy data__\n\n<br />\n\n## Import core libraries\nUsed \
 for template engine WLX", "Display" -> "markdown", 
-    "Hash" -> "c7415f1d-5249-427a-bd69-d2ce967849c1", "Invisible" -> False, 
+    "Hash" -> "d52362d8-cf7a-45cd-9e81-57c85fe291e3", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <||>, "PublicFields" -> {"Properties"}, 
     "State" -> "Idle", "Type" -> "Output", "UID" -> Null, 
-    "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> "<<JerryI`WLX`Importer`\n<<JerryI`WLX`WebUI`", 
     "Display" -> "codemirror", "Hash" -> 
-     "979d5912-b111-4840-b7cf-ee4fa4089eb0", "Invisible" -> False, 
+     "39b37dc7-4cef-4fea-8fd6-46211dc2b7bf", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <|"InitGroup" -> True|>, 
     "PublicFields" -> {"Properties"}, "State" -> "Idle", "Type" -> "Input", 
-    "UID" -> Null, "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "UID" -> Null, "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> "\"Caching is enabled for 1 hour! Type \
 JerryI`WLX`Importer`Private`CacheControl[False] to disable it\"", 
-    "Display" -> "print", "Hash" -> "6e725e67-8f9f-46f8-8ca4-6d0d18781fc9", 
+    "Display" -> "print", "Hash" -> "06b21c5c-878d-44ed-9dc7-675c3389675b", 
     "Invisible" -> False, "MetaOnly" -> False, "Props" -> <||>, 
     "PublicFields" -> {"Properties"}, "State" -> "Idle", "Type" -> "Output", 
-    "UID" -> Null, "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "UID" -> Null, "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> ".md\n## Import 3rd party libraries\nUsed for material \
 parameters extraction", "Display" -> "codemirror", 
-    "Hash" -> "55f6617e-5a56-42df-992b-e097eed4d21a", "Invisible" -> False, 
+    "Hash" -> "2fdef136-78ea-4733-94ce-7b6cce081af4", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <|"Hidden" -> True|>, 
     "PublicFields" -> {"Properties"}, "State" -> "Idle", "Type" -> "Input", 
-    "UID" -> Null, "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "UID" -> Null, "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> 
      "## Import 3rd party libraries\nUsed for material parameters extraction"\
-, "Display" -> "markdown", "Hash" -> "f693bea7-39cb-4499-b47f-9be0a626f438", 
+, "Display" -> "markdown", "Hash" -> "4e858207-82f7-4f67-a3e0-9667a7e13bc2", 
     "Invisible" -> False, "MetaOnly" -> False, "Props" -> <||>, 
     "PublicFields" -> {"Properties"}, "State" -> "Idle", "Type" -> "Output", 
-    "UID" -> Null, "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "UID" -> Null, "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> "LPMRepositories[{\n    Github -> \
 \"https://github.com/JerryI/wl-tds-tools\" -> \
 \"master\"\n}];\n\nGet[\"JerryI`TDSTools`Trace`\"];\nGet[\"JerryI`TDSTools`Tr\
 ansmission`\"];\nGet[\"JerryI`TDSTools`Material`\"];", 
     "Display" -> "codemirror", "Hash" -> 
-     "63258d81-f629-4d11-8963-a1c6f15da9ee", "Invisible" -> False, 
+     "f7959306-c337-4c01-9d42-e29fa18769a9", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <|"InitGroup" -> True|>, 
     "PublicFields" -> {"Properties"}, "State" -> "Idle", "Type" -> "Input", 
-    "UID" -> Null, "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "UID" -> Null, "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> 
      ">> \"LPM >> fetching info for JerryI/wl-tds-tools on Github...\"", 
-    "Display" -> "print", "Hash" -> "d7639ab7-d785-436e-98f9-d62fc60aa0b3", 
+    "Display" -> "print", "Hash" -> "7c26abaa-4c4e-4e7f-9373-f96921f67c23", 
     "Invisible" -> False, "MetaOnly" -> False, "Props" -> <||>, 
     "PublicFields" -> {"Properties"}, "State" -> "Idle", "Type" -> "Output", 
-    "UID" -> Null, "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "UID" -> Null, "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> ">> \"LPM >> will be INSTALLED: 0\"", "Display" -> "print", 
-    "Hash" -> "f2e704ab-c60b-4328-b551-e31aebe13857", "Invisible" -> False, 
+    "Hash" -> "f6938b3b-3097-4c66-a93c-dea927b5be3e", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <||>, "PublicFields" -> {"Properties"}, 
     "State" -> "Idle", "Type" -> "Output", "UID" -> Null, 
-    "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> ">> \"LPM >> will be REMOVED: 0\"", "Display" -> "print", 
-    "Hash" -> "78f24e83-0795-47c6-ba42-43c2da0f2939", "Invisible" -> False, 
+    "Hash" -> "0f88e5af-90c3-4bcf-a497-d190cbc7db37", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <||>, "PublicFields" -> {"Properties"}, 
     "State" -> "Idle", "Type" -> "Output", "UID" -> Null, 
-    "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> ">> \"LPM >> checking cached\"", "Display" -> "print", 
-    "Hash" -> "3e8ee4b7-72bc-4663-a3e3-5979f5736498", "Invisible" -> False, 
+    "Hash" -> "bea86075-cc0c-49d3-b816-e235f8446bd1", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <||>, "PublicFields" -> {"Properties"}, 
     "State" -> "Idle", "Type" -> "Output", "UID" -> Null, 
-    "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> 
      ">> \"LPM >> fetching info for JerryI/wl-tds-tools on Github...\"", 
-    "Display" -> "print", "Hash" -> "bc0d6924-a709-4f5d-a847-0927a8cc41fa", 
+    "Display" -> "print", "Hash" -> "653e2757-7c20-448f-b252-80edf0b6699e", 
     "Invisible" -> False, "MetaOnly" -> False, "Props" -> <||>, 
     "PublicFields" -> {"Properties"}, "State" -> "Idle", "Type" -> "Output", 
-    "UID" -> Null, "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "UID" -> Null, "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> ">> \"LPM >> fetching packages info\"", "Display" -> "print", 
-    "Hash" -> "d998801d-bb46-4dbe-90b6-c1a3d2da49af", "Invisible" -> False, 
+    "Hash" -> "c27eb8af-a185-4bff-b451-8e242c4ef8ff", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <||>, "PublicFields" -> {"Properties"}, 
     "State" -> "Idle", "Type" -> "Output", "UID" -> Null, 
-    "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> ".md\n## Import WLX components\nUsed for drawing windows and \
 interactivity", "Display" -> "codemirror", 
-    "Hash" -> "c6ac207b-ff3a-4900-ac18-d2140fac21f4", "Invisible" -> False, 
+    "Hash" -> "961fadc0-ff32-41e6-bdec-b7c6029876eb", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <|"Hidden" -> True|>, 
     "PublicFields" -> {"Properties"}, "State" -> "Idle", "Type" -> "Input", 
-    "UID" -> Null, "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "UID" -> Null, "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> 
      "## Import WLX components\nUsed for drawing windows and interactivity", 
     "Display" -> "markdown", "Hash" -> 
-     "9edeaca4-f933-45b3-81e8-0b07b20ae0ed", "Invisible" -> False, 
+     "ca21a7dc-3699-4ad2-970b-46bbc9d2eb25", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <||>, "PublicFields" -> {"Properties"}, 
     "State" -> "Idle", "Type" -> "Output", "UID" -> Null, 
-    "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> "notebookDir = NotebookDirectory[];\nmodulesDir = \
 FileNameJoin[{notebookDir, \"Modules\", \"Services\"}];\nviewsDir = \
 FileNameJoin[{notebookDir, \"Modules\", \"Views\"}];\n\n{fileLoader, sorter} \
@@ -135,25 +135,25 @@ ImportComponent[FileNameJoin[{notebookDir, \"Common\", \
 \"ResultsTable\", \"ResultsTable.wlx\"}]];\n{summary, views, exporter} = \
 ImportComponent[FileNameJoin[{viewsDir, \"Summary\", \"Summary.wlx\"}]];", 
     "Display" -> "codemirror", "Hash" -> 
-     "81c45891-4161-4d0f-993a-98b3775cba30", "Invisible" -> False, 
+     "2183fb28-4f41-4821-b5b5-8868a0cc81a8", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <|"InitGroup" -> True|>, 
     "PublicFields" -> {"Properties"}, "State" -> "Idle", "Type" -> "Input", 
-    "UID" -> Null, "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "UID" -> Null, "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> ".md\n## App logic\nCombine all together to make an \
 app.\n\n<br/>\n\n### Data processing pipeline\nFrom importing files, \
 processing phase, material parameters to giving the results back", 
     "Display" -> "codemirror", "Hash" -> 
-     "5f207a12-5fb6-4b31-91fd-7ee358d3a310", "Invisible" -> False, 
+     "a17ff9a3-b2b2-40fb-90e5-f26dbd362692", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <|"Hidden" -> True|>, 
     "PublicFields" -> {"Properties"}, "State" -> "Idle", "Type" -> "Input", 
-    "UID" -> Null, "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "UID" -> Null, "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> "## App logic\nCombine all together to make an app.\n\n<br \
 />\n\n### Data processing pipeline\nFrom importing files, processing phase, \
 material parameters to giving the results back", "Display" -> "markdown", 
-    "Hash" -> "5366dea3-95da-4bbf-93a2-d1833666626a", "Invisible" -> False, 
+    "Hash" -> "11927e3e-0750-45bd-96d9-b5411446826e", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <||>, "PublicFields" -> {"Properties"}, 
     "State" -> "Idle", "Type" -> "Output", "UID" -> Null, 
-    "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> "takeFileName[f_] := \
 takeFileName[File[ToLowerCase[f[\"Tags\"][\"Filename\"][[1]]]]]\ntakeFileName\
 [File[f_]] := StringReplace[ToLowerCase[f], {\n  \"_reference_\" -> \"_\", \
@@ -162,64 +162,49 @@ takeFileName[File[ToLowerCase[f[\"Tags\"][\"Filename\"][[1]]]]]\ntakeFileName\
 \"_sam\" -> \"\", \"sam\" -> \"\"\n}]\ntakeFileName[f_String] := \
 takeFileName[File[f]]\n\nsortFiles[list_List] := With[{\n  names = \
 FileBaseName[takeFileName[#]] & /@ list\n},\n  If[Length[list] > 1,\n    \
-list[[sorter[names]]]\n  ,\n    list\n  ]\n]\n\nmainPipeline[notebook_, \
-files_List] := With[{promise = Promise[]}, Module[{process}, \n    process = \
-fileLoader[files];\n    process[\"Progress\"] = 0.2;\n\n    \
-Then[process[\"Promise\"], Function[res, \n      process[\"Files\"] = .;\n    \
-  Delete[process];\n      \n      process = fileImporter[res[\"Files\"]];\n   \
-   process[\"Progress\"] = 0.4;\n\n      Then[process[\"Promise\"], \
-Function[results,\n        process[\"Files\"] = .;\n        \
-Delete[process];\n      \n        process = phaseUnwrap[results[\"Files\"]]; \
-\n        process[\"Progress\"] = 0.7;\n\n        Then[process[\"Promise\"], \
-Function[r,\n          process[\"Files\"] = .;\n          \
-Delete[process];\n\n          Then[ChoiceDialogAsync[\"Apply high-accuracy \
-material parameters extraction procedure\", \"Notebook\"->notebook], \
-Function[choise,\n            If[choise,\n            \n              process \
-= materialParams[r[\"Files\"]];\n              process[\"Progress\"] = \
-0.85;\n\n              Then[process[\"Promise\"], Function[resultMaterial, \n \
-               process[\"Files\"] = .;\n                Delete[process];\n    \
-        \n                EventFire[promise, Resolve, \
-sortFiles[resultMaterial[\"Files\"]]];\n             \n              ]];\n\n  \
-            CellPrint[windowContainer[process, Null], \"Display\" -> \"wlx\", \
-\"Target\" -> _, \"Notebook\" -> notebook, ImageSize -> {1.3 526 1.5, 1.3 651 \
-/ 1.1}];            \n            \n            ,\n            \n             \
- EventFire[promise, Resolve, sortFiles[r[\"Files\"]]];\n            \n        \
-    ]\n          ]];\n          \n        ]];\n\n        \
+list[[sorter[names]]]\n  ,\n    list\n  ]\n]\n\nmainPipeline = \
+AsyncFunction[{notebook, files}, Module[{process, result, choise},\n\n    \
+process = fileLoader[files];\n    process[\"Progress\"] = 0.2;\n\n    \
+CellPrint[windowContainer[process, Null], \"Display\" -> \"wlx\", \
+\"Notebook\" -> notebook, \"Target\" -> _, ImageSize -> {1.5 526,  1.1 \
+651/1.5}];\n    \n    result = process[\"Promise\"] // Await;\n\n    \
+process[\"Files\"] = .;\n    Delete[process];\n      \n    process = \
+fileImporter[result[\"Files\"]];\n    process[\"Progress\"] = 0.4;\n\n    \
 CellPrint[windowContainer[process, Null], \"Display\" -> \"wlx\", \"Target\" \
--> _, \"Notebook\" -> notebook, ImageSize -> {1.3 526 1.2, 1.3 651 / 1.2}];\n \
-     ]];\n\n      CellPrint[windowContainer[process, Null], \"Display\" -> \
+-> _, \"Notebook\" -> notebook, ImageSize -> {1.3 526 1.2,  651 1.15}];\n\n   \
+ result = process[\"Promise\"] // Await;\n    process[\"Files\"] = .;\n    \
+Delete[process];\n\n    choise = ChoiceDialogAsync[\"Perform phase \
+unwrapping\", \"Notebook\"->notebook] // Await;\n\n    If[choise,\n      \
+process = phaseUnwrap[result[\"Files\"]]; \n      process[\"Progress\"] = \
+0.7;\n\n      CellPrint[windowContainer[process, Null], \"Display\" -> \
 \"wlx\", \"Target\" -> _, \"Notebook\" -> notebook, ImageSize -> {1.3 526 \
-1.2,  651 1.15}];\n    ]];\n\n    CellPrint[windowContainer[process, Null], \
-\"Display\" -> \"wlx\", \"Notebook\" -> notebook, \"Target\" -> _, ImageSize \
--> {1.5 526,  1.1 651/1.5}];\n\n    promise\n\n]];", 
-    "Display" -> "codemirror", "Hash" -> 
-     "7a2301a1-5f1d-45e3-8961-a92f884b4f38", "Invisible" -> False, 
+1.2, 1.3 651 / 1.2}];\n\n      result = process[\"Promise\"] // Await;\n      \
+process[\"Files\"] = .;\n      Delete[process]; \n\n      choise = \
+ChoiceDialogAsync[\"Apply high-accuracy material parameters extraction \
+procedure\", \"Notebook\"->notebook] // Await;\n\n      If[choise,\n        \
+process = materialParams[result[\"Files\"]];\n        process[\"Progress\"] = \
+0.85;\n        \n        CellPrint[windowContainer[process, Null], \
+\"Display\" -> \"wlx\", \"Target\" -> _, \"Notebook\" -> notebook, ImageSize \
+-> {1.3 526 1.5, 1.3 651 / 1.1}];\n        \n        result = \
+process[\"Promise\"] // Await;\n        process[\"Files\"] = .;\n        \
+Delete[process];        \n      ];\n      \n    ];\n\n    \
+sortFiles[result[\"Files\"]]\n\n]];", "Display" -> "codemirror", 
+    "Hash" -> "04adf231-b2af-4628-82d6-eb3bdcd087d3", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <|"InitGroup" -> True|>, 
     "PublicFields" -> {"Properties"}, "State" -> "Idle", "Type" -> "Input", 
-    "UID" -> Null, "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
-   <|"Data" -> "", "Display" -> "codemirror", 
-    "Hash" -> "f44e6150-9c48-4b7d-87c0-10794d0e0df2", "Invisible" -> False, 
-    "MetaOnly" -> False, "Props" -> <||>, "PublicFields" -> {"Properties"}, 
-    "State" -> "Idle", "Type" -> "Input", "UID" -> Null, 
-    "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
-   <|"Data" -> "Promise[\"92954415-4e76-49eb-a62b-0407a54372ce\"]", 
-    "Display" -> "codemirror", "Hash" -> 
-     "ffbacaa0-bec4-4587-921d-3cfb862b3656", "Invisible" -> False, 
-    "MetaOnly" -> False, "Props" -> <||>, "PublicFields" -> {"Properties"}, 
-    "State" -> "Idle", "Type" -> "Output", "UID" -> Null, 
-    "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "UID" -> Null, "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> ".md\n## Supplimentary pipleline\nUsed for loading folders", 
     "Display" -> "codemirror", "Hash" -> 
-     "044425d9-c775-469b-87d0-35634ec6b6af", "Invisible" -> False, 
+     "c59c5d8f-ccab-423b-a424-d604c121e495", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <|"Hidden" -> True|>, 
     "PublicFields" -> {"Properties"}, "State" -> "Idle", "Type" -> "Input", 
-    "UID" -> Null, "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "UID" -> Null, "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> "## Supplimentary pipleline\nUsed for loading folders", 
     "Display" -> "markdown", "Hash" -> 
-     "e46b0b20-63f7-47ae-a68f-466a0951d646", "Invisible" -> False, 
+     "929fa4e7-e02b-46ee-9f07-f7f59151c2de", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <||>, "PublicFields" -> {"Properties"}, 
     "State" -> "Idle", "Type" -> "Output", "UID" -> Null, 
-    "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> "convertAllToFiles[File[f_]] := f;\nconvertAllToFiles[any_] := \
 FileNameTake /@ (any[\"Tags\"][\"Filename\"]);\nconvertAllToFiles[files_List, \
 path_String] := Map[FileNameJoin[{path, #}]&, convertAllToFiles /@ files // \
@@ -265,20 +250,20 @@ EventHandler[win, {\"Closed\" -> Function[Null,\n              \
 ClearAll[session];\n           ]}];\n           \n           \
 ClearAll[garbageCollector];\n        ];\n      \n]]", 
     "Display" -> "codemirror", "Hash" -> 
-     "aabb0401-ab60-4cf5-b23c-7cedd8fc1540", "Invisible" -> False, 
+     "9e6dd928-886b-4832-a51f-76297919e99d", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <|"InitGroup" -> True|>, 
     "PublicFields" -> {"Properties"}, "State" -> "Idle", "Type" -> "Input", 
-    "UID" -> Null, "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "UID" -> Null, "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> ".md\n## Landing Window", "Display" -> "codemirror", 
-    "Hash" -> "30168a6e-033b-4239-a035-09b840ff5b1b", "Invisible" -> False, 
+    "Hash" -> "94b9c6fd-53fa-4f5e-9e8e-6771d365c1e1", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <|"Hidden" -> True|>, 
     "PublicFields" -> {"Properties"}, "State" -> "Idle", "Type" -> "Input", 
-    "UID" -> Null, "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "UID" -> Null, "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> "## Landing Window", "Display" -> "markdown", 
-    "Hash" -> "110055ee-b7a3-4d89-b9a2-55a95c25d770", "Invisible" -> False, 
+    "Hash" -> "77b9e91e-c741-4cb1-a4ce-b11e7b4f17d9", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <||>, "PublicFields" -> {"Properties"}, 
     "State" -> "Idle", "Type" -> "Output", "UID" -> Null, 
-    "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> ".wlx\n\nWith[{\n  UId = CreateUUID[],\n  event = \
 CreateUUID[],\n  notebook = EvaluationNotebook[]\n}, \
 Module[{garbageCollector},\n\n        garbageCollector := With[{win = \
@@ -330,15 +315,15 @@ ml-1\">Upload</span>\n  </button>  \n</div>\n\n  <WebUIEventListener \
 Id={StringJoin[\"upload-\", UId]} Event={event} Pattern={\"Upload\"} />\n  \
 <WebUIEventListener Id={StringJoin[\"explore-\", UId]} Event={event} \
 Pattern={\"Explore\"} />\n  \n</div>\n\n]]", "Display" -> "codemirror", 
-    "Hash" -> "ddded132-4dff-4af7-a58c-de1684948dff", "Invisible" -> False, 
+    "Hash" -> "87642553-701a-4ac7-81ed-61168df0f52d", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <||>, "PublicFields" -> {"Properties"}, 
     "State" -> "Idle", "Type" -> "Input", "UID" -> Null, 
-    "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>, 
+    "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>, 
    <|"Data" -> "<div class=\"ml-auto mr-auto mt-auto mb-auto px-3 py-2\"><div \
 class=\"pb-4\"><h4 class=\"text-gray-700 uppercase \
 text-md\">Terakitchen</h4><small class=\"text-gray-700\">Start from \
 here</small></div><div class=\"ml-auto mr-auto mt-auto mb-auto flex flex-row \
-gap-x-2\"><button id=\"explore-e2af0159-e13d-49de-a09c-6326de206fc2\" \
+gap-x-2\"><button id=\"explore-3ea3e226-5401-4b62-997c-88c343bfefd3\" \
 title=\"Browse\" class=\"flex items-center gap-x-1 bg-gray-50 rounded border \
 p-1 px-2\"><svg class=\"w-5 h-5\" viewBox=\"0 0 24 24\" fill=\"none\" \
 xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"24\" height=\"24\"/><path \
@@ -350,7 +335,7 @@ d=\"M17.2362 9H2.30925C1.64988 9 1.17099 9.62698 1.34449 10.2631L3.59806 \
 19.373 20.6555 18.7369L18.201 9.73688C18.0823 9.30182 17.6872 9 17.2362 9Z\" \
 stroke=\"#000000\"/></svg><span class=\"text-xs \
 ml-1\">Browse</span></button><button \
-id=\"upload-e2af0159-e13d-49de-a09c-6326de206fc2\" title=\"Upload\" \
+id=\"upload-3ea3e226-5401-4b62-997c-88c343bfefd3\" title=\"Upload\" \
 class=\"flex items-center gap-x-1 bg-gray-50 rounded border p-1 px-2\"><svg \
 class=\"w-5 h-5\" viewBox=\"0 0 24 24\" fill=\"none\" \
 xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"24\" height=\"24\"/><path \
@@ -360,18 +345,18 @@ d=\"M12 15L12 3M12 3L8 7M12 3L16 7\" stroke=\"#000000\" \
 stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg><span \
 class=\"text-xs ml-1\">Upload</span></button></div><script type=\"module\"> \
 const el = \
-document.getElementById('upload-e2af0159-e13d-49de-a09c-6326de206fc2');\n     \
+document.getElementById('upload-3ea3e226-5401-4b62-997c-88c343bfefd3');\n     \
    el.addEventListener('click', function (e) {\n            \
-server.kernel.io.fire('8301b726-5eee-4e2a-80be-2a6b522038ef', \
+server.kernel.io.fire('ebcc17f1-7816-44a5-ad70-36c74caf5f17', \
 encodeURIComponent(String(el.value)), 'Upload');\n        });</script><script \
 type=\"module\"> const el = \
-document.getElementById('explore-e2af0159-e13d-49de-a09c-6326de206fc2');\n    \
+document.getElementById('explore-3ea3e226-5401-4b62-997c-88c343bfefd3');\n    \
     el.addEventListener('click', function (e) {\n            \
-server.kernel.io.fire('8301b726-5eee-4e2a-80be-2a6b522038ef', \
+server.kernel.io.fire('ebcc17f1-7816-44a5-ad70-36c74caf5f17', \
 encodeURIComponent(String(el.value)), 'Explore');\n        \
 });</script></div>", "Display" -> "wlx", 
-    "Hash" -> "116d7a2d-54fe-43c3-af9f-6ac0eff829b6", "Invisible" -> False, 
+    "Hash" -> "78154ca4-83e1-4169-af57-5ade1c928e4c", "Invisible" -> False, 
     "MetaOnly" -> False, "Props" -> <||>, "PublicFields" -> {"Properties"}, 
     "State" -> "Idle", "Type" -> "Output", "UID" -> Null, 
-    "Notebook" -> "5324409e-a64d-45ec-a891-02a5b379dab7"|>}, 
+    "Notebook" -> "e5856bd1-1584-4b64-8cfd-4565a0680c3c"|>}, 
  "serializer" -> "jsfn4"|>
