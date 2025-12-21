@@ -49,13 +49,21 @@ guessFormat[path_, l_Association ] := Module[{
 
 forward[process_, props_] := 
     With[{traces = Map[Function[pair,
-
-        TransmissionObject[
-            TDTrace[ parse[pair["Sample"], process["ParsingOptions"] ], "PadZeros"->If[process["Padding"] == 0, None, process["Padding"] ] ],
-            TDTrace[ parse[pair["Reference"], process["ParsingOptions"] ], "PadZeros"->If[process["Padding"] == 0, None, process["Padding"] ] ],
-            "Thickness" -> process["Thickness"],
-            "Gain" -> process["Gain"],
-            "Tags" -> <|"Filename" -> {FileNameTake[pair["Sample"] ], FileNameTake[pair["Reference"] ]}, "Notes" -> process["Notes"]|>
+        
+        With[{
+            s = TDTrace[ parse[pair["Sample"], process["ParsingOptions"] ], "PadZeros"->If[process["Padding"] == 0, None, process["Padding"] ] ],
+            r = TDTrace[ parse[pair["Reference"], process["ParsingOptions"] ], "PadZeros"->If[process["Padding"] == 0, None, process["Padding"] ] ]
+        },
+            TransmissionObject[
+                s,r,
+                "Thickness" -> process["Thickness"],
+                "Gain" -> process["Gain"],
+                "Tags" -> <|
+                    "Filename" -> {FileNameTake[pair["Sample"] ], FileNameTake[pair["Reference"] ]}, 
+                    "Notes" -> process["Notes"],
+                    "Traces" -> {s,r}
+                |>
+            ]
         ]
 
     ], process["Files"] ]},

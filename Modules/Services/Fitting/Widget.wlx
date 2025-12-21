@@ -1,0 +1,481 @@
+SliderPanel[data_] := With[{EditorWidget = EditorView[data, "FullReset"->True, "Selectable"->False]},
+  <div class="sm-controls cursor-default rounded-md 0 py-2 px-3 bg-gray-50 text-left text-gray-900 text-sm ring-1 ring-inset ring-gray-400 scroll-y" style="max-height:200px; overflow-y: scroll">
+    <EditorWidget/>    
+  </div>
+]
+
+BandpassWidget[OptionsPattern[]] := With[{
+  object = OptionValue["Object"],
+  event = OptionValue["Event"]
+},
+{
+  spec = Unique["bandpass"],
+  curve = Unique["bandpassCurve"],
+  bandpass = Unique["bandpassCtl"],
+  initial = (getSpectrum[object] // calcPowerSpectrum)[[;;;;4]]
+},
+{
+  minMax = getMinMax[initial],
+  maxY = getMaxY[initial]
+},
+{
+  recal = Function[Null, With[{filter = calcFilter[bandpass, initial]},
+    curve = Transpose[{initial[[All,1]], maxY filter}];
+    spec = applyFilter[initial, filter];
+    test = bandpass;
+  ]]
+},
+  bandpass = {0.5`,0.5`,142.61678730487483`};
+  recal[];
+
+  EventHandler[event, {
+    "GetFilter" -> Function[spectrum,
+        calcFilter[bandpass, spectrum]
+    ]
+  }];
+  
+  Graphics[{
+    Line[spec // Offload],
+    Pink, Line[curve // Offload], EventHandler[Disk[{minMax//Mean, maxY/2.0}, Offset[5{1,1}]], {         
+      "drag" -> Function[xy,
+             bandpass[[{1,2}]] = {xy[[1]], xy[[2]]/maxY};
+             recal[];
+             EventFire[event, "RootUpdate", True];
+      ],
+      "zoom" -> Function[k,
+             bandpass[[{3}]] = k;
+             recal[];
+             EventFire[event, "RootUpdate", True];
+      ]}]
+  },
+    PlotRange->{minMax, {0, maxY}},
+    PlotLabel->"Bandpass",
+    AspectRatio->0.5, Frame->True, FrameLabel->{"wavenumber (1/cm)", "Amplitude"}
+  ]
+];
+
+Options[BandpassWidget] = {"Object"->Null, "Event"->Null};
+
+
+TracesWidget[OptionsPattern[]] := With[{
+  object = OptionValue["Object"],
+  event = OptionValue["Event"]
+},
+{
+  initialSpectrum = QuantityMagnitude[object["Tags"]["Traces"][[1]]["Spectrum"], {1/"Centimeters", 1}],
+  convertToTime = calcTrace,
+
+  referenceSpectrum = QuantityMagnitude[resampleFromTo[object["Tags"]["Traces"][[2]], object["Tags"]["Traces"][[1]] ]["Spectrum"], {1/"Centimeters", 1}]
+},
+{
+  filteredTrace = Unique["traces"],
+  modelled = Unique["tracesModel"],
+  initial = initialSpectrum // convertToTime
+},
+{
+  minMax  = MinMax[initial[[All,1]]],
+  minMaxY = 0.4 MinMax[initial[[All,2]]]
+},
+  filteredTrace = initial;
+  modelled = filteredTrace;
+
+  EventHandler[event, {
+    "RootUpdate" -> Function[Null,
+        With[{calculated = EventFire[event, "ModelSpectrum", referenceSpectrum]},
+          modelled =  calculated[[1]] // convertToTime;
+          filteredTrace = calculated[[2]] // convertToTime;
+        ];
+    ],
+    "GetTraces" -> Function[Null,
+        With[{calculated = EventFire[event, "ModelSpectrum", referenceSpectrum]},
+          modelled =  calculated[[1]] // convertToTime;
+          filteredTrace = calculated[[2]] // convertToTime;
+          {modelled, filteredTrace}
+        ]      
+    ]
+  }];
+  
+  Graphics[{
+    (*VB[*)(RGBColor[0.24, 0.6, 0.8])(*,*)(*"1:eJxTTMoPSmNiYGAo5gUSYZmp5S6pyflFiSX5RcEsQBHn4PCQNGaQPAeQCHJ3cs7PyS8q2iHX+jpwxzn7ImMweGxfNGsmCLy0BwBgKxmG"*)(*]VB*), Line[filteredTrace // Offload],
+    Opacity[0.8],
+    Orange, Line[modelled // Offload]
+  },
+    PlotRange->{minMax, minMaxY},
+    AspectRatio->0.5, Frame->True, FrameLabel->{"time (ps)", "Amplitude"}
+  ]
+];
+
+Options[TracesWidget] = {"Object"->Null, "Event"->Null};
+
+getAtOrSet[symbol_, index_, value_] := Module[{},
+  If[Length[symbol] < index, symbol = Join[symbol, Table[Null, {index - Length[symbol]}]]];
+  If[symbol[[index]] === Null,
+    symbol[[index]] = With[{
+      sym = Unique["oscSym3"]
+    },{
+      held = Hold[sym]
+    },
+      sym = value;
+      held
+    ];
+  ];
+  symbol[[index]]
+];
+
+assignSymAt[symbol_, index_, value_] := With[{s = symbol[[index]]},
+  assignSymAt[s, value];
+];
+
+assignSymAt[symbol_, index_, part_, value_] := With[{s = symbol[[index]]},
+  assignSymAt[s, part, value];
+];
+
+assignSymAt[Hold[sym_], val_] := sym = val;
+assignSymAt[Hold[sym_], part_, val_] := sym[[part]] = val;
+
+removeNulls[list_] := list /. {Null -> Nothing};
+
+SetAttributes[getAtOrSet, HoldFirst];
+
+createSliderObject[externalEvent_, init_:Null] := Module[{
+  object,
+  controls = {},
+  state = {},
+  hashMap,
+  tableString = "",
+  index = 1,
+  cancelNext = False
+}, With[{
+    dragEvents = EventObject[],
+    events = EventObject[]
+  },
+  { 
+    
+    addNew = Function[d, With[{
+      trackerSymbol = getAtOrSet[state, index, d]
+    },
+    {
+      omega = InputRange[dragEvents, 2, 200, 0.05, "Label"->"\[Omega]", "Topic"->ToString[3 index - 3 + 2], "TrackedExpression"->{Offload[trackerSymbol[[2]]], "Debounce"}],
+      strength = InputRange[dragEvents, 0, 300, 0.05, "Label"->"f", "Topic"->ToString[3 index - 3 + 1], "TrackedExpression"->{Offload[trackerSymbol[[1]]], "Debounce"}],
+      damping = InputRange[dragEvents, 0.01, 10, 0.01, "Label"->"\[Gamma]", "Topic"->ToString[3 index - 3 + 3], "TrackedExpression"->{Offload[trackerSymbol[[3]]], "Debounce"}],
+      rm = InputButton[events, "❌", "Topic"->ToString[index]]
+    },
+      index = index + 1; 
+      AppendTo[controls, {omega, strength, damping, rm}];
+    ] ]
+},
+{
+  addButton = InputButton[events, "Add", "Topic"->"Add"]
+},
+ 
+  If[init =!= Null,
+      addNew[#] &/@ init;      
+  ];
+    
+
+  tableString = ToString[TableForm[Prepend[controls//Reverse, {addButton, "", "", ""}]], StandardForm];
+
+
+  EventHandler[dragEvents, {
+    i_String :> Function[payload,
+      assignSymAt[state, Floor[(ToExpression[i]-1)/3]+1, ToExpression[i]-3Floor[(ToExpression[i]-1)/3], payload];
+      EventFire[externalEvent, "Updated", state[[Floor[(ToExpression[i]-1)/3]+1]]];
+    ]
+  }];
+
+  EventHandler[events, {"Add" -> Function[Null,
+    addNew[{10.0, 50.0, 1.0}];
+    Do[With[{inx = inx}, assignSymAt[inx, ReleaseHold[inx]]], {inx, state}];
+    tableString = ToString[TableForm[Prepend[controls//Reverse, {addButton, "", "", ""}]], StandardForm];
+    EventFire[externalEvent, "Added", state // Last];
+  ], i_String :> Function[Null,
+    controls = {};
+    index = 1;
+    EventFire[externalEvent, "Removed", With[{k = ToExpression[i]}, Part[state, k] ]];
+    state = With[{
+      f = ToExpression[i]
+    }, ReplacePart[state, {
+      f -> Nothing
+    }] ];
+    Do[addNew[{10.0, 50.0, 1.0}], {Length[state]}];
+    Do[With[{inx = inx}, assignSymAt[inx, ReleaseHold[inx]]], {inx, state}];
+    tableString = ToString[TableForm[Prepend[controls//Reverse, {addButton, "", "", ""}]], StandardForm];
+    
+  ]}]; 
+
+  object["State"] := state;
+  object["Event"] = dragEvents;
+  object["Sliders"] = SliderPanel[Offload[tableString]];
+  
+  object
+] ];
+
+ModelSpectrumWidget[OptionsPattern[] ] := With[{
+  object = OptionValue["Object"],
+  event = OptionValue["Event"]
+},
+{
+  initial = getSpectrum[object],
+  slidersEvents = EventObject[],
+  ref = FrontInstanceReference[]
+},
+{
+  modelled = Unique["modelSpec"],
+  original = Unique["orgSpec"],
+  absorption = Unique["orgAbs"],
+  parameters = Unique["parametersModel"],
+  env = Unique["scalingModel"],
+  hashMap = Unique["hashMapMod"],
+  minMax = getMinMax[calcPowerSpectrum[initial] ],
+  maxY = getMaxY[calcPowerSpectrum[initial] ],
+  parametersObject = Unique["pOMod"],
+  initialOscs = Unique["initOsc"]
+},
+  original = calcPowerSpectrum[initial];
+  modelled = calcPowerSpectrum[initial];
+  absorption = getAbsorption[object];
+
+  env = <|"scale"->1.0, "fp"->False, "L"->getThickness[object], "\[Epsilon]"->1.0|>;
+  initialOscs = {};
+
+  If[KeyExistsQ[object["Tags"], "Fitting"],
+    env = object["Tags"]["Fitting"]["Env"];
+    parametersObject = createSliderObject[slidersEvents, object["Tags"]["Fitting"]["State"] ];
+
+    Do[With[{symbol = parametersObject["State"][[i]]},
+      hashMap[symbol] = FrontInstanceGroup[];
+      With[{u = Unique["tempSym"]},
+        hashMap[symbol, "Projection"] = Hold[u];
+        u = ReleaseHold[symbol][[2]];
+        AppendTo[initialOscs, hashMap[symbol][{
+          RandomColor[], EventHandler[Disk[{Offload[u], maxY/1.2}, Offset[4{1,1}]], {"dragsignal" -> Function[xy,
+          assignSymAt[symbol, ReplacePart[ReleaseHold[symbol], {2->xy[[1]], 1->(ReleaseHold[symbol][[1]] (1 - (*FB[*)((xy[[2]]-maxY/1.2)(*,*)/(*,*)(5.0 maxY))(*]FB*)))}] ];
+          u = xy[[1]];
+          EventFire[event, "RootUpdate", True];
+          ]}]
+        }] ];
+      ];
+    ], {i, Length[ object["Tags"]["State"] ]}];
+  ,
+    parametersObject = createSliderObject[slidersEvents, Null];
+  ];
+
+  
+
+  EventHandler[slidersEvents, {
+    "Scale" -> Function[scale, 
+      env["scale"] = scale;
+      EventFire[event, "RootUpdate", True];
+    ],
+
+    "Epsilon" -> Function[eps,
+      env["\[Epsilon]"] = eps;
+      EventFire[event, "RootUpdate", True];
+    ],
+    "FP" -> Function[fp,
+      env["fp"] = fp;
+      EventFire[event, "RootUpdate", True];
+    ],
+    "Added" -> Function[symbol,
+      hashMap[symbol] = FrontInstanceGroup[];
+      With[{u = Unique["tempSym"]},
+        hashMap[symbol, "Projection"] = Hold[u];
+        u = ReleaseHold[symbol][[2]];
+        FrontSubmit[hashMap[symbol][{
+          RandomColor[], EventHandler[Disk[{Offload[u], maxY/1.2}, Offset[4{1,1}]], {"dragsignal" -> Function[xy,
+          assignSymAt[symbol, ReplacePart[ReleaseHold[symbol], {2->xy[[1]], 1->(ReleaseHold[symbol][[1]] (1 - (*FB[*)((xy[[2]]-maxY/1.2)(*,*)/(*,*)(5.0 maxY))(*]FB*)))}]];
+          u = xy[[1]];
+          EventFire[event, "RootUpdate", True];
+          ]}]
+        }], ref];
+      ];
+      
+      EventFire[event, "RootUpdate", True];
+    ],
+    "Removed" -> Function[symbol,
+      Delete[hashMap[symbol]];
+      EventFire[event, "RootUpdate", True];
+    ],
+    "Updated" -> Function[symbol,
+      With[{s = hashMap[symbol, "Projection"]}, If[Head[s] === Hold,
+        assignSymAt[s, ReleaseHold[symbol][[2]]];
+        EventFire[event, "RootUpdate", True];
+      ] ];
+    ],
+    _ -> Function[Null,
+      EventFire[event, "RootUpdate", True];
+    ]
+  }];
+  
+  EventHandler[event, {
+    "GetModel" -> Function[Null,
+      <|"Env"->env, "State"->(ReleaseHold /@ parametersObject["State"])|>
+    ],
+    "ModelSpectrum" -> Function[reference,
+      With[{
+        m = calcModel[env["scale"], env["fp"], env["L"], env["\[Epsilon]"], 
+          ReleaseHold /@ parametersObject["State"]
+        ],
+        d = calcDielectric[env["scale"], env["fp"], env["L"], env["\[Epsilon]"], 
+          ReleaseHold /@ parametersObject["State"]
+        ]
+      },
+      {
+        out = calcSpectrum[reference, m]
+      },
+      {
+        filtered = applyFilter[out, EventFire[event, "GetFilter", out]],
+        initialFiltered = applyFilter[initial, EventFire[event, "GetFilter", initial]]
+      },
+        modelled = calcPowerSpectrum[filtered];
+        original = calcPowerSpectrum[initialFiltered];
+        absorption = calcAbsorption[reference, d];
+        {filtered, initialFiltered}
+      ]
+    ],
+    "GetModelSpectrum" -> Function[reference,
+      With[{
+        m = calcModel[env["scale"], env["fp"], env["L"], env["\[Epsilon]"], 
+          ReleaseHold /@ parametersObject["State"]
+        ],
+        d = calcDielectric[env["scale"], env["fp"], env["L"], env["\[Epsilon]"], 
+          ReleaseHold /@ parametersObject["State"]
+        ]
+      },
+      {
+        out = calcSpectrum[reference, m]
+      },
+      {
+        filtered = applyFilter[out, EventFire[event, "GetFilter", out]],
+        initialFiltered = applyFilter[initial, EventFire[event, "GetFilter", initial]]
+      },
+        modelled = calcPowerSpectrum[filtered];
+        original = calcPowerSpectrum[initialFiltered];
+        absorption = calcAbsorption[reference, d];
+        {modelled, absorption, original, getAbsorption[object]}
+      ]
+    ],
+    "ModelAll" -> Function[reference,
+      With[{
+        m = calcModel[env["scale"], env["fp"], env["L"], env["\[Epsilon]"], 
+          ReleaseHold /@ parametersObject["State"]
+        ],
+        d = calcDielectric[env["scale"], env["fp"], env["L"], env["\[Epsilon]"], 
+          ReleaseHold /@ parametersObject["State"]
+        ]
+      },
+      {
+        out = calcSpectrum[reference, m]
+      },
+      {
+        filtered = applyFilter[out, EventFire[event, "GetFilter", out]],
+        initialFiltered = applyFilter[initial, EventFire[event, "GetFilter", initial]]
+      },
+        {Drop[ calcAbsorption[reference, d], 10], {#[[1]], Clip[#[[2]]^2, {0,1}]}&/@ Drop[calcPowerSpectrum[filtered], 10]}
+      ]
+    ]
+  }];
+
+  <|"Transmission"->Graphics[{
+    (*VB[*)(RGBColor[0.24, 0.6, 0.8])(*,*)(*"1:eJxTTMoPSmNiYGAo5gUSYZmp5S6pyflFiSX5RcEsQBHn4PCQNGaQPAeQCHJ3cs7PyS8q2iHX+jpwxzn7ImMweGxfNGsmCLy0BwBgKxmG"*)(*]VB*), Line[original // Offload],
+    Opacity[0.8],
+    Orange, Line[modelled // Offload], ref, initialOscs
+  },
+    PlotRange->{minMax, {0, maxY}},
+    AspectRatio->0.5, Frame->True, FrameLabel->{"wavenumber (1/cm)", "Amplitude"}
+  ], "Absorption"->Graphics[{
+    Line[getAbsorption[object] ],
+    (*VB[*)(RGBColor[0.24, 0.8, 0.6])(*,*)(*"1:eJxTTMoPSmNiYGAo5gUSYZmp5S6pyflFiSX5RcEsQBHn4PCQNGaQPAeQCHJ3cs7PyS8q2iHX+jpwxzn7ImMweGxfNGsmCLy0BwBgKxmG"*)(*]VB*),
+    Opacity[0.8],
+    EventHandler[Null, {"onload" -> Function[Null,
+      EventFire[event, "RootUpdate", True];
+    ]}],
+    Line[absorption // Offload]
+  },
+    AspectRatio->0.4, Frame->True, FrameLabel->{"wavenumber (1/cm)", "\[Alpha] (1/cm)"}
+  ], "Sliders"->parametersObject["Sliders"], "Parameters"->Row[{
+    InputRange[slidersEvents, 1,30,0.1,env["\[Epsilon]"], "Label"->"\[Epsilon]∞", "Topic"->"Epsilon"],
+    <div style="width:1rem"></div>,
+    InputRange[slidersEvents, 0.2,1.8,0.1,env["scale"], "Label"->"Scale", "Topic"->"Scale"],
+    <div style="width:1rem"></div>,
+    InputCheckbox[slidersEvents, env["fp"], "Label"->"Reflections", "Topic"->"FP"]
+  }]|>
+  
+];
+
+Options[ModelSpectrumWidget] = {"Object"->"", "Event"->""}
+
+silentGeneration[object_] := Module[{}, With[{
+  eventObject = EventObject[]
+},
+  BandpassWidget["Event" -> eventObject, "Object" -> object];
+  TracesWidget["Event" -> eventObject, "Object" -> object];
+  ModelSpectrumWidget["Event"->eventObject, "Object"-> object];
+
+  EventFire[eventObject, "ModelAll", QuantityMagnitude[resampleFromTo[object["Tags"]["Traces"][[2]], object["Tags"]["Traces"][[1]] ]["Spectrum"], {1/"Centimeters", 1}] ]
+] ];
+
+createWidget[object_] := Module[{w}, With[{
+  eventObject = EventObject[]
+},
+{
+  modelService = ModelSpectrumWidget["Event"->eventObject, "Object"->object]
+},
+{
+  TransmissionWindow = modelService["Transmission"],
+  AbsorptionWindow = modelService["Absorption"],
+  SlidersWindow = modelService["Sliders"],
+  ParametersWindow = modelService["Parameters"],
+  ExportButton = InputButton["Export Data"]
+},
+
+  EventHandler[ExportButton, Function[Null, 
+    With[{
+      pdir = SystemDialogInputAsync["Directory"]
+    },
+    {
+      traces = EventFire[eventObject, "GetTraces", True],
+      spectrum = EventFire[eventObject, "GetModelSpectrum", QuantityMagnitude[resampleFromTo[object["Tags"]["Traces"][[2]], object["Tags"]["Traces"][[1]] ]["Spectrum"], {1/"Centimeters", 1}] ]
+    }
+      Then[pdir, Function[dir,
+        If[FileExistsQ[dir] // TrueQ, 
+          Export[FileNameJoin[{dir, "Traces.dat"}], Join[Transpose[traces[[1]]], {Transpose[traces[[2]]][[2]]}] // Transpose ];
+          Export[FileNameJoin[{dir, "Spectrum.dat"}], Join[Transpose[spectrum[[1]]], {Transpose[spectrum[[3]]][[2]]}] // Transpose ];
+          Export[FileNameJoin[{dir, "Absorption.dat"}], Join[Transpose[spectrum[[2]]], {Transpose[spectrum[[4]]][[2]]}] // Transpose ];
+          Export[FileNameJoin[{dir, "Parameters.json"}],  EventFire[eventObject, "GetModel", True] ];
+        ];      
+      ] ];
+
+    ]
+  ] ];
+
+  w["View"] = 
+    <div class="gap-x-2 flex h-full justify-between pr-2 divide-x flex-row mt-2">
+      <div class="flex flex-col gap-y-3">
+        <h5 class="text-gray-900">Filtering</h5>
+        <BandpassWidget Event={eventObject} Object={object}/>
+        <h5 class="text-gray-900">Medium properties</h5>
+        <ParametersWindow/>
+        <h5 class="text-gray-900">Lorentz Oscillators</h5>
+        <SlidersWindow/>
+        <hr/><br/>
+        <ExportButton/>
+      </div>
+      <div class="flex flex-col gap-y-3">
+        <h5 class="text-gray-900">Reconstructed spectra</h5>
+        <TracesWidget Event={eventObject} Object={object}/>
+        <AbsorptionWindow/>
+        <TransmissionWindow/>
+      </div>
+    </div>
+    ;
+
+  w["Get"] := Module[{o = object},
+    o = Append[o, "Tags"->Join[o["Tags"], <|"Fitting"->EventFire[eventObject, "GetModel", True]|>] ];
+    o
+  ]; 
+  
+  w
+] ];
+
+{createWidget, silentGeneration}

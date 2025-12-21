@@ -65,7 +65,17 @@ tableWidget[files_List, Event_String, allowP_:False] := With[{
 <button class="flex flex-col">
                   <svg class="w-5 h-5" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M924.086857 282.843429l-362.057143 210.724571v415.378286s227.108571-137.728 238.738286-144.384c11.190857-6.436571 26.331429 0.731429 28.891429 17.554285 0.146286 0.731429 1.462857 4.973714 1.462857 5.705143 1.536 18.212571-0.731429 26.770286-12.580572 33.718857l-273.993143 162.742858c-6.948571 3.510857-16.091429 5.485714-30.72-1.755429-7.168-3.218286-424.301714-255.268571-424.301714-255.268571a24.649143 24.649143 0 0 1-11.702857-20.772572V251.611429c0-2.486857-2.413714-25.526857 13.385143-35.913143L517.558857 2.633143a24.137143 24.137143 0 0 1 21.796572 0l426.276571 213.138286c9.508571 4.827429 17.481143 14.628571 16.749714 23.844571a29.622857 29.622857 0 0 1 0.512 5.412571v437.028572c0 16.164571-13.165714 29.257143-29.330285 29.257143h-0.073143a29.403429 29.403429 0 0 1-29.403429-29.330286V282.843429zM495.908571 903.972571V493.714286L141.604571 290.230857v397.677714L495.908571 904.045714zM191.195429 236.251429l337.188571 191.122285 337.042286-191.122285L528.310857 67.876571 191.195429 236.251429z" fill="currentColor" /></svg>
   <span>Export</span>
-                </button>                 
+                </button>  
+<button class="flex flex-col">
+  <svg class="w-5 h-5" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="48" height="48" fill="white" fill-opacity="0.01"/>
+<path d="M4 24C4 24 6 4 14 4C22 4 23 19 24 24C25 29 28 44 35 44C42 44 44 24 44 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M11 24H17" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M31 24H37" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+                  
+  <span>Fitting</span>
+                </button>                                
               </th>
             </tr>
           </thead>
@@ -142,6 +152,15 @@ tableWidget[files_List, Event_String, allowP_:False] := With[{
               return;
             }            
             server.kernel.io.fire('<Event/>', Array.from(selectedRows).map((e) => e+1), 'Export');
+          });
+
+          buttons[3].addEventListener('click', () => {
+            if (selectedRows.size == 0) {
+              console.warn( [lastSelectedIndex + 1] );
+              server.kernel.io.fire('<Event/>', [lastSelectedIndex + 1], 'Fitting');
+              return;
+            }            
+            server.kernel.io.fire('<Event/>', Array.from(selectedRows).map((e) => e+1), 'Fitting');
           });
 
           trs.forEach((tr, i) => {
