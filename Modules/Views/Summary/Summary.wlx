@@ -1,7 +1,7 @@
 views[All] = {"Alpha", "n", "Transmission", "ComplexTransmission", "NKPairs", "Fitting"}
 
 description["Alpha", {t__MaterialParameters}] = {"Absorption", "Absorption coefficient was calculated by solving equations for n and k extracted from the transmission data"}
-description["Alpha", {t__TransmissionObject}] = {"Absorption", "Absorption coefficient was calculated by taking -Log(T)/thickness using transmission data"}
+description["Alpha", {t__TransmissionObject}] = {"Absorption", "Absorption coefficient was calculated by taking -Log(T)/thickness - (Fresnel losses) using transmission data"}
 
 description["Transmission", _] = {"Transmission Spectrum", ""};
 description["n", {t__MaterialParameters}] = {"Refractive index", "Refractive index was calculated by solving equations for n and k extracted from the transmission data"}

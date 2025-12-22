@@ -396,7 +396,7 @@ ModelSpectrumWidget[OptionsPattern[] ] := With[{
   },
     AspectRatio->0.4, Background->White, Frame->True, FrameLabel->{"wavenumber (1/cm)", "\[Alpha] (1/cm)"}
   ], "Sliders"->parametersObject["Sliders"], "Parameters"->Row[{
-    InputRange[slidersEvents, 1,30,0.1,env["\[Epsilon]"], "Label"->"\[Epsilon]∞", "Topic"->"Epsilon"],
+    InputRange[slidersEvents, 1,30,0.1,env["\[Epsilon]"], "Label"->"\[Epsilon]∞", "Topic"->"Epsilon", Appearance->"FineTuning"],
     <div style="width:1rem"></div>,
     InputRange[slidersEvents, 0.2,1.8,0.1,env["scale"], "Label"->"Scale", "Topic"->"Scale"],
     <div style="width:1rem"></div>,
