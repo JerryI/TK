@@ -103,10 +103,10 @@ With[{
       Graphics1 = Graphics[{
         {ColorData[97][1], Opacity[0.5], Line[rawAlpha // Offload]},
         ColorData[97][2], Line[alpha // Offload]
-      }, ImageSize->{500,350}, Frame->True, Axes->True, "GUI"->False, FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}],
+      }, Background->White, ImageSize->{500,350}, Frame->True, Axes->True, "GUI"->False, FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}],
       Graphics2 = Graphics[{
         ColorData[97][3], Line[n // Offload]
-      }, ImageSize->{500,200}, Frame->True, Axes->True, "GUI"->False, FrameLabel->{"wavenumber (cm^{-1})", "n"}]  
+      }, Background->White, ImageSize->{500,200}, Frame->True, Axes->True, "GUI"->False, FrameLabel->{"wavenumber (cm^{-1})", "n"}]  
     }, 
 
       <div class="flex flex-col gap-y-3">

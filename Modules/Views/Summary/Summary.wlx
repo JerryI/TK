@@ -75,7 +75,7 @@ views["Transmission", {t_TransmissionObject | t_MaterialParameters}] := With[{
             Graphics[{
                 ColorData[97][5], Line[ Select[QuantityMagnitude[t["Transmission"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] // clipT ],
                 Dashed, ColorData[97][8], Line[ Select[QuantityMagnitude[cached["Transmission"], {1/"Centimeters", 1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
-            }, ImageSize->{500,350}, 
+            }, ImageSize->{500,350}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
                 FrameLabel->{"wavenumber (cm^{-1})", "T"}
             ]
@@ -83,7 +83,7 @@ views["Transmission", {t_TransmissionObject | t_MaterialParameters}] := With[{
     ,
         Graphics[{
             ColorData[97][5], Line[ Select[QuantityMagnitude[t["Transmission"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] // clipT ]
-        }, ImageSize->{500,350}, 
+        }, ImageSize->{500,350}, Background->White,
             Frame->True, Axes->True, "GUI"->False,
             FrameLabel->{"wavenumber (cm^{-1})", "T"}
         ]
@@ -95,7 +95,7 @@ views["Alpha", {t_TransmissionObject}] := With[{
 },
     Graphics[{
         ColorData[97][2], Line[ Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
-    }, ImageSize->{500,350}, 
+    }, ImageSize->{500,350}, Background->White,
         Frame->True, Axes->True, "GUI"->False,
         FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
     ]
@@ -117,7 +117,7 @@ views["Alpha", t: {__TransmissionObject}] := With[{
                 Transpose[{palette, MapIndexed[Function[{item, index}, 
                     Line[ (# + {0, step (index - 1)}) &/@ item]
                 ], dataset]}]
-            }, ImageSize->{500,600}, 
+            }, ImageSize->{500,600}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
                 FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
             ]
@@ -141,7 +141,7 @@ views["Transmission", t: ({__TransmissionObject} | {__MaterialParameters})] := W
                 Transpose[{palette, MapIndexed[Function[{item, index}, 
                     Line[ (# + {0, step (index[[1]] - 1)}) &/@ item]
                 ], dataset]}]
-            }, ImageSize->{500,600}, 
+            }, ImageSize->{500,600}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
                 FrameLabel->{"wavenumber (cm^{-1})", "T"}
             ]
@@ -198,7 +198,7 @@ views["Alpha", {t_MaterialParameters}] := With[{
             Graphics[{
                 ColorData[97][2], Line[ Select[QuantityMagnitude[t["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ],
                 Opacity[0.5], Red, Line[ Select[QuantityMagnitude[cached["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
-            }, ImageSize->{500,350}, 
+            }, ImageSize->{500,350}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
                 FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
             ]
@@ -206,7 +206,7 @@ views["Alpha", {t_MaterialParameters}] := With[{
     ,
         Graphics[{
             ColorData[97][2], Line[ Select[QuantityMagnitude[t["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
-        }, ImageSize->{500,350}, 
+        }, ImageSize->{500,350}, Background->White,
             Frame->True, Axes->True, "GUI"->False,
             FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
         ]
@@ -232,7 +232,7 @@ views["Alpha", t: {__MaterialParameters}] := With[{
                 Transpose[{palette, MapIndexed[Function[{item, index}, 
                     Line[ (# + {0, step (index[[1]] - 1)}) &/@ item]
                 ], dataset]}]
-            }, ImageSize->{500,600}, 
+            }, ImageSize->{500,600}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
                 FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
             ]
@@ -297,7 +297,7 @@ views["Alpha", {t_TransmissionObject}] := With[{
             Graphics[{
                 ColorData[97][2], Line[ Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ],
                 Dashed, ColorData[97][7], Line[ Select[QuantityMagnitude[cached["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
-            }, ImageSize->{500,350}, 
+            }, ImageSize->{500,350}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
                 FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
             ]
@@ -305,7 +305,7 @@ views["Alpha", {t_TransmissionObject}] := With[{
     ,
         Graphics[{
             ColorData[97][2], Line[ Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
-        }, ImageSize->{500,350}, 
+        }, ImageSize->{500,350}, Background->White,
             Frame->True, Axes->True, "GUI"->False,
             FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
         ]
@@ -328,7 +328,7 @@ views["Alpha", t: {__TransmissionObject}] := With[{
                 Transpose[{palette, MapIndexed[Function[{item, index}, 
                     Line[ (# + {0, step (index[[1]] - 1)}) &/@ item]
                 ], dataset]}]
-            }, ImageSize->{500,600}, 
+            }, ImageSize->{500,600}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
                 FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
             ]
@@ -363,7 +363,7 @@ views["n", {t_MaterialParameters}] := With[{
 },
     Graphics[{
         ColorData[97][2], Line[ Select[QuantityMagnitude[t["n"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
-    }, ImageSize->{500,150}, 
+    }, ImageSize->{500,150}, Background->White,
         Frame->True, Axes->True, "GUI"->False,
         FrameLabel->{"wavenumber (cm^{-1})", "refractive index"}
     ]
@@ -386,7 +386,7 @@ views["n", t: {__MaterialParameters}] := With[{
                 Transpose[{palette, MapIndexed[Function[{item, index}, 
                     Line[ (# + {0, step (index[[1]] - 1)}) &/@ item]
                 ], dataset]}]
-            }, ImageSize->{500,400}, 
+            }, ImageSize->{500,400}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
                 FrameLabel->{"wavenumber (cm^{-1})", "refractive index"}
             ]

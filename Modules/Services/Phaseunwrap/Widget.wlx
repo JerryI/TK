@@ -136,6 +136,7 @@ widget[t_TransmissionObject, threshold_] := With[
           },
           Frame -> True, 
           Axes -> True, 
+          Background->White,
           Epilog -> {
             rects,
             ref,

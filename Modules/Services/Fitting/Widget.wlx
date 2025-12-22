@@ -43,7 +43,7 @@ BandpassWidget[OptionsPattern[]] := With[{
              EventFire[event, "RootUpdate", True];
       ],
       "zoom" -> Function[k,
-             bandpass[[{3}]] = k;
+             bandpass[[{3}]] = 132.0 k;
              recal[];
              EventFire[event, "RootUpdate", True];
       ]}]
@@ -101,6 +101,7 @@ TracesWidget[OptionsPattern[]] := With[{
     Orange, Line[modelled // Offload]
   },
     PlotRange->{minMax, minMaxY},
+    Background->White,
     AspectRatio->0.5, Frame->True, FrameLabel->{"time (ps)", "Amplitude"}
   ]
 ];
@@ -155,9 +156,9 @@ createSliderObject[externalEvent_, init_:Null] := Module[{
       trackerSymbol = getAtOrSet[state, index, d]
     },
     {
-      omega = InputRange[dragEvents, 2, 200, 0.05, "Label"->"\[Omega]", "Topic"->ToString[3 index - 3 + 2], "TrackedExpression"->{Offload[trackerSymbol[[2]]], "Debounce"}],
-      strength = InputRange[dragEvents, 0, 300, 0.05, "Label"->"f", "Topic"->ToString[3 index - 3 + 1], "TrackedExpression"->{Offload[trackerSymbol[[1]]], "Debounce"}],
-      damping = InputRange[dragEvents, 0.01, 10, 0.01, "Label"->"\[Gamma]", "Topic"->ToString[3 index - 3 + 3], "TrackedExpression"->{Offload[trackerSymbol[[3]]], "Debounce"}],
+      omega = InputRange[dragEvents, 2, 200, 0.05, "Label"->"\[Omega]", "Topic"->ToString[3 index - 3 + 2], "TrackedExpression"->{Offload[trackerSymbol[[2]]], "Debounce"}, Appearance->"FineTuning"],
+      strength = InputRange[dragEvents, 0, 300, 0.05, "Label"->"f", "Topic"->ToString[3 index - 3 + 1], "TrackedExpression"->{Offload[trackerSymbol[[1]]], "Debounce"}, Appearance->"FineTuning"],
+      damping = InputRange[dragEvents, 0.01, 10, 0.01, "Label"->"\[Gamma]", "Topic"->ToString[3 index - 3 + 3], "TrackedExpression"->{Offload[trackerSymbol[[3]]], "Debounce"}, Appearance->"FineTuning"],
       rm = InputButton[events, "❌", "Topic"->ToString[index]]
     },
       index = index + 1; 
@@ -382,6 +383,7 @@ ModelSpectrumWidget[OptionsPattern[] ] := With[{
     Orange, Line[modelled // Offload], ref, initialOscs
   },
     PlotRange->{minMax, {0, maxY}},
+    Background->White,
     AspectRatio->0.5, Frame->True, FrameLabel->{"wavenumber (1/cm)", "Amplitude"}
   ], "Absorption"->Graphics[{
     Line[getAbsorption[object] ],
@@ -392,7 +394,7 @@ ModelSpectrumWidget[OptionsPattern[] ] := With[{
     ]}],
     Line[absorption // Offload]
   },
-    AspectRatio->0.4, Frame->True, FrameLabel->{"wavenumber (1/cm)", "\[Alpha] (1/cm)"}
+    AspectRatio->0.4, Background->White, Frame->True, FrameLabel->{"wavenumber (1/cm)", "\[Alpha] (1/cm)"}
   ], "Sliders"->parametersObject["Sliders"], "Parameters"->Row[{
     InputRange[slidersEvents, 1,30,0.1,env["\[Epsilon]"], "Label"->"\[Epsilon]∞", "Topic"->"Epsilon"],
     <div style="width:1rem"></div>,
