@@ -278,10 +278,11 @@ views["Fitting", {t_TransmissionObject | t_MaterialParameters}] := If[KeyExistsQ
     Null
 ]
 
-exporter["Fitting", {t_}] := With[{p = t["Tags"]["Fitting"]},
+exporter["Fitting", {t_}] := With[{p = t["Tags"]["Fitting"], cached = fitting`generate[t, terakitchen`$sessionViewId] },
     Then[SystemDialogInputAsync["FileSave", {Null, {"Text" -> {"*.txt"}, "JSON" -> {"*.json"}}}], Function[path,
         If[StringQ[path],
-            Export[path, p]
+            Export[path, p];
+            Export[FileNameJoin[{DirectoryName[path], StringJoin[FileBaseName[path], "_absorption.dat"]}], QuantityMagnitude[cached["\[Alpha]"], {1,1}/"Centimeters"] ];
         ]
     ]];    
 ]
