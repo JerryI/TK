@@ -265,7 +265,7 @@ views["Fitting", {__}] := Null;
 views["Fitting", {t_TransmissionObject | t_MaterialParameters}] := If[KeyExistsQ[t["Tags"], "Fitting"],
     With[{
         P2 = With[{data = t["Tags"]["Fitting"]["State"]},
-            Map[<|"ω0 (1/cm)" -> #[[1]], "Strength (1/cm²)" -> #[[1]], "γ (1/cm)" -> #[[3]]|>&, data]
+            Map[<|"ω0 (1/cm)" -> #[[2]], "Strength (1/cm²)" -> #[[1]], "γ (1/cm)" -> #[[3]]|>&, data]
         ] // Dataset,
         Eq = CellView[StringJoin["n(\\omega) = \\sqrt{", ToString[t["Tags"]["Fitting"]["Env"]["\[Epsilon]"]], " + \\sum \\frac{S}{\\Omega_0^2 - \\omega^2 + i \\Gamma \\omega}}"], "Display"->"latex"]
     },
