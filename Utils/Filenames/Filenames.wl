@@ -1,10 +1,10 @@
 BeginPackage["JerryI`Terakitchen`Utils`Filenames`", {
-    "JerryI`Misc`Events`",
-    "JerryI`Misc`Events`Promise`",
-    "JerryI`Misc`WLJS`Transport`",
-    "JerryI`Misc`Language`",
-    "JerryI`WLX`",
-    "JerryI`WLX`Importer`"
+    "CoffeeLiqueur`Misc`Events`",
+    "CoffeeLiqueur`Misc`Events`Promise`",
+    "CoffeeLiqueur`Misc`WLJS`Transport`",
+    "CoffeeLiqueur`Misc`Language`",
+    "CoffeeLiqueur`WLX`",
+    "CoffeeLiqueur`WLX`Importer`"
 }]
 
 groupFilesByTags;

@@ -1,7 +1,7 @@
 BeginPackage["JerryI`Terakitchen`Process`", {
-    "KirillBelov`Objects`",
-    "JerryI`Misc`Events`",
-    "JerryI`Misc`Events`Promise`"
+    "CoffeeLiqueur`Objects`",
+    "CoffeeLiqueur`Misc`Events`",
+    "CoffeeLiqueur`Misc`Events`Promise`"
 }]
 
 processObject;
