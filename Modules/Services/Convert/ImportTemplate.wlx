@@ -18,8 +18,6 @@ updatePreview[group_, ref_, dataset_] := With[{}, If[group =!= Null, Delete[grou
 
 SetAttributes[updatePreview, HoldFirst]
 
-
-
 Component[path_, parser_, opts_] := LeakyModule[{
     optsMutable = opts,
     DataPreview,
@@ -27,7 +25,7 @@ Component[path_, parser_, opts_] := LeakyModule[{
     group = Null,
     hashMap = <|"1"->True, "2"->True|>,
     controller = CreateUUID[],
-    params = <|"Thickness" -> Quantity[1, "Millimeters"], "Gain"->1, "Padding"->0, "Aperture"->Quantity[2, "Millimeters"]|>,
+    params = <|"Thickness" -> Quantity[1, "Millimeters"], "Gain"->1, "Padding"->0|>,
     object
 }, With[{
     ref = FrontInstanceReference[],
@@ -70,10 +68,6 @@ Component[path_, parser_, opts_] := LeakyModule[{
             params["Thickness"] = Quantity[If[StringQ[#], ToExpression[#], #]& @ thickness, "Millimeters"];
         ],
 
-        "aperture" -> Function[ap,
-            params["Aperture"] = Quantity[If[StringQ[#], ToExpression[#], #]& @ ap, "Millimeters"];
-        ],
-
         "gain" -> Function[gain,
             params["Gain"] = If[StringQ[#], ToExpression[#], #]& @ gain;
 
@@ -101,32 +95,6 @@ Component[path_, parser_, opts_] := LeakyModule[{
                 <FormatSelect/>
                 <UnitsSelection/>
                 <HeaderRange/>
-                <ZerosPadding/>
-            </div>
-            <div class="pt-2">
-                <div class="flex flex-col gap-y-2">
-                    <h5 class="text-gray-900">Sample information</h5>
-                    <div>
-                        <label class="block mb-2 text-sm text-gray-900" for="thickness-input">Thickness (mm)</label>
-                        <input min="0.0001" max="10" step="0.0001" value="1" type="number" id="thickness-input" class="block w-full p-2 py-1 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500"/>
-                        <WebUIEventListener Id={"thickness-input"} Event={controller} Pattern={"thickness"} Type={"change"} />
-                    </div>
-                    <div>
-                        <label class="block mb-2 text-sm text-gray-900" for="aperture-input">Aperture (mm)</label>
-                        <input min="0.5" max="10" step="0.1" value="2" type="number" id="aperture-input" class="block w-full p-2 py-1 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500"/>
-                        <WebUIEventListener Id={"aperture-input"} Event={controller} Pattern={"aperture"} Type={"change"} />
-                    </div>                    
-                    <div>
-                        <label class="block mb-2 text-sm text-gray-900" for="gain-input">Gain</label>
-                        <input min="0.1" max="3" step="0.1" value="1" type="number" id="gain-input" class="block w-full p-2 py-1 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500"/>
-                        <WebUIEventListener Id={"gain-input"} Event={controller} Pattern={"gain"} Type={"change"} />
-                    </div>
-                    <div>
-                        <label class="block mb-2 text-sm text-gray-900" for="comments-input">Notes</label>
-                        <input type="text" value="" id="comments-input" class="block w-full p-2 py-1 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500"/>
-                        <WebUIEventListener Id={"comments-input"} Event={controller} Pattern={"comments"} Type={"change"} />
-                    </div>                  
-                </div>                
             </div>
         </div>
     </div> ];

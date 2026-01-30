@@ -65,27 +65,42 @@ exporter["NKPairs", t: {__MaterialParameters}] := With[{
 
 clipT[list_List] := Map[{#[[1]], Clip[#[[2]], {0,1}]}&, list]
 
+getCutoff[t_TransmissionObject | t_MaterialParameters] := With[{aperture = QuantityMagnitude[Lookup[t["Tags"], "Aperture", Quantity[1, "Millimeters"]], "Millimeters"]},
+    Round[16.5 / aperture, 0.5]
+]
+
 views["Transmission", {t_TransmissionObject | t_MaterialParameters}] := With[{
     fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t["FDCI"]) {1/2.0, 2.0}
+}, {
+    cutoff = Max[getCutoff[t], fdci[[1]] ]
+},
+{
+    tT = Select[QuantityMagnitude[t["Transmission"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] // clipT
 },
     If[KeyExistsQ[t["Tags"], "Fitting"] && False,
         With[{
             cached = fitting`generate[t, terakitchen`$sessionViewId]
         },
             Graphics[{
-                ColorData[97][5], Line[ Select[QuantityMagnitude[t["Transmission"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] // clipT ],
+                ColorData[97][5], Line[ tT ],
                 Dashed, ColorData[97][8], Line[ Select[QuantityMagnitude[cached["Transmission"], {1/"Centimeters", 1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
             }, ImageSize->{500,350}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
-                FrameLabel->{"wavenumber (cm^{-1})", "T"}
+                FrameLabel->{"wavenumber (cm^{-1})", "T"},
+                Epilog->{
+                    Red, Dashed, Opacity[0.7], Line[{{cutoff, Min[ tT[[All,2]] ]}, {cutoff,  Max[ tT[[All,2]] ]}}]
+                }
             ]
         ]  
     ,
         Graphics[{
-            ColorData[97][5], Line[ Select[QuantityMagnitude[t["Transmission"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] // clipT ]
+            ColorData[97][5], Line[ tT ]
         }, ImageSize->{500,350}, Background->White,
             Frame->True, Axes->True, "GUI"->False,
-            FrameLabel->{"wavenumber (cm^{-1})", "T"}
+            FrameLabel->{"wavenumber (cm^{-1})", "T"},
+            Epilog->{
+                    Red, Dashed, Opacity[0.7], Line[{{cutoff, Min[ tT[[All,2]] ]}, {cutoff,  Max[ tT[[All,2]] ]}}]
+            }
         ]
     ]
 ]
@@ -93,17 +108,29 @@ views["Transmission", {t_TransmissionObject | t_MaterialParameters}] := With[{
 views["Alpha", {t_TransmissionObject}] := With[{
     fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t["FDCI"]) {1/2.0, 2.0}
 },
+{
+    cutoff = Max[getCutoff[t], fdci[[1]] ]
+},
+{
+    tT = Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]]
+},
     Graphics[{
-        ColorData[97][2], Line[ Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
+        ColorData[97][2], Line[ tT ]
     }, ImageSize->{500,350}, Background->White,
         Frame->True, Axes->True, "GUI"->False,
-        FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
+        FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"},
+        Epilog->{
+                    Red, Dashed, Opacity[0.7], Line[{{cutoff, Min[ tT[[All,2]] ]}, {cutoff,  Max[ tT[[All,2]] ]}}]
+        }
     ]
 ]
 
 views["Alpha", t: {__TransmissionObject}] := With[{
     fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"]) {1/2.0, 2.0},
     bdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"])
+},
+{
+    cutoff = Max[getCutoff[t[[1]]], fdci[[1]] ]
 },
     With[{
         dataset = Select[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] &/@ t,
@@ -113,13 +140,19 @@ views["Alpha", t: {__TransmissionObject}] := With[{
             step = Round[Differences[ MinMax[bestset[[1, All, 2]]] ][[1]], 50],
             palette = Table[ColorData["DarkRainbow"][i / Length[dataset]], {i, Length[dataset]}]
         },
+        {
+            offseted = MapIndexed[Function[{item, index}, 
+                    (# + {0, step (index - 1)}) &/@ item
+                ], dataset]
+        },
             Graphics[{
-                Transpose[{palette, MapIndexed[Function[{item, index}, 
-                    Line[ (# + {0, step (index - 1)}) &/@ item]
-                ], dataset]}]
+                Transpose[{palette, Line /@ offseted}]
             }, ImageSize->{500,600}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
-                FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
+                FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"},
+                Epilog->{
+                    Red, Dashed, Opacity[0.7], Line[{{cutoff, Min[ offseted[[All,All,2]] ]}, {cutoff,  Max[ offseted[[All,All,2]] ]}}]
+                }                
             ]
         ] 
     ] 
@@ -129,6 +162,9 @@ views["Transmission", t: ({__TransmissionObject} | {__MaterialParameters})] := W
     fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"]) {1/2.0, 2.0},
     bdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"])
 },
+{
+    cutoff = Max[getCutoff[t[[1]]], fdci[[1]] ]
+},
     With[{
         dataset = clipT[Select[QuantityMagnitude[#["Transmission"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]]] &/@ t,
         bestset = clipT[Select[QuantityMagnitude[#["Transmission"], {1/"Centimeters",1}], Function[i, i[[1]] >= bdci[[1]] && i[[1]] <= bdci[[2]]]]] &/@ t
@@ -137,13 +173,19 @@ views["Transmission", t: ({__TransmissionObject} | {__MaterialParameters})] := W
             step = Ceiling[Differences[ MinMax[bestset[[1, All, 2]]] ][[1]], 0.5] // Abs,
             palette = Table[ColorData["DarkRainbow"][i / Length[dataset]], {i, Length[dataset]}]
         },
+        {
+            offseted = MapIndexed[Function[{item, index}, 
+                     (# + {0, step (index[[1]] - 1)}) &/@ item
+                ], dataset]
+        },
             Graphics[{
-                Transpose[{palette, MapIndexed[Function[{item, index}, 
-                    Line[ (# + {0, step (index[[1]] - 1)}) &/@ item]
-                ], dataset]}]
+                Transpose[{palette, Line /@ offseted}]
             }, ImageSize->{500,600}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
-                FrameLabel->{"wavenumber (cm^{-1})", "T"}
+                FrameLabel->{"wavenumber (cm^{-1})", "T"},
+                Epilog->{
+                    Red, Dashed, Opacity[0.7], Line[{{cutoff, Min[ offseted[[All,All,2]] ]}, {cutoff,  Max[ offseted[[All,All,2]] ]}}]
+                }  
             ]
         ] 
     ] 
@@ -190,25 +232,37 @@ exporter["Transmission", t:({__TransmissionObject} | {__MaterialParameters})] :=
 views["Alpha", {t_MaterialParameters}] := With[{
     fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t["FDCI"]) {1/2.0, 2.0}
 },
+{
+    cutoff = Max[getCutoff[t], fdci[[1]] ]
+},
+{
+    tT = Select[QuantityMagnitude[t["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]]
+},
 
     If[KeyExistsQ[t["Tags"], "Fitting"],
         With[{
             cached = fitting`generate[t, terakitchen`$sessionViewId]
         },
             Graphics[{
-                ColorData[97][2], Line[ Select[QuantityMagnitude[t["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ],
+                ColorData[97][2], Line[ tT ],
                 Opacity[0.5], Red, Line[ Select[QuantityMagnitude[cached["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
             }, ImageSize->{500,350}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
-                FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
+                FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"},
+                Epilog->{
+                    Red, Dashed, Opacity[0.7], Line[{{cutoff, Min[ tT[[All,2]] ]}, {cutoff,  Max[ tT[[All,2]] ]}}]
+                }       
             ]
         ]      
     ,
         Graphics[{
-            ColorData[97][2], Line[ Select[QuantityMagnitude[t["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
+            ColorData[97][2], Line[ tT ]
         }, ImageSize->{500,350}, Background->White,
             Frame->True, Axes->True, "GUI"->False,
-            FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
+            FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"},
+            Epilog->{
+                    Red, Dashed, Opacity[0.7], Line[{{cutoff, Min[ tT[[All,2]] ]}, {cutoff,  Max[ tT[[All,2]] ]}}]
+            }   
         ]
     ]
 ]
@@ -220,6 +274,9 @@ views["Alpha", t: {__MaterialParameters}] := With[{
     fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"]) {1/2.0, 2.0},
     bdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"])
 },
+{
+    cutoff = Max[getCutoff[t[[1]]], fdci[[1]] ]
+},
     With[{
         dataset = Select[QuantityMagnitude[#["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] &/@ t,
         bestset = Select[QuantityMagnitude[#["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= bdci[[1]] && i[[1]] <= bdci[[2]]]] &/@ t
@@ -228,13 +285,20 @@ views["Alpha", t: {__MaterialParameters}] := With[{
             step = Ceiling[Differences[ MinMax[bestset[[1, All, 2]]] ][[1]] // Abs, 50],
             palette = Table[ColorData["DarkRainbow"][i / Length[dataset]], {i, Length[dataset]}]
         },
+        {
+            offseted = MapIndexed[Function[{item, index}, 
+                   (# + {0, step (index[[1]] - 1)}) &/@ item
+                ], dataset]
+        },
             Graphics[{
-                Transpose[{palette, MapIndexed[Function[{item, index}, 
-                    Line[ (# + {0, step (index[[1]] - 1)}) &/@ item]
-                ], dataset]}]
+                Transpose[{palette, Line /@ offseted}]
             }, ImageSize->{500,600}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
-                FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
+                FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"},
+                Epilog->{
+                    Red, Dashed, Opacity[0.7], Line[{{cutoff, Min[ offseted[[All,All,2]] ]}, {cutoff,  Max[ offseted[[All,All,2]] ]}}]
+                }  
+                
             ]
         ] 
     ] 
@@ -291,24 +355,36 @@ exporter["Fitting", {t_}] := With[{p = t["Tags"]["Fitting"], cached = fitting`ge
 views["Alpha", {t_TransmissionObject}] := With[{
     fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t["FDCI"]) {1/2.0, 2.0}
 },
+{
+    cutoff = Max[getCutoff[t], fdci[[1]] ]
+},
+{
+    tT = Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]]
+},
     If[KeyExistsQ[t["Tags"], "Fitting"],
         With[{
             cached = fitting`generate[t, terakitchen`$sessionViewId]
         },
             Graphics[{
-                ColorData[97][2], Line[ Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ],
+                ColorData[97][2], Line[ tT ],
                 Dashed, ColorData[97][7], Line[ Select[QuantityMagnitude[cached["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
             }, ImageSize->{500,350}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
-                FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
+                FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"},
+                Epilog->{
+                    Red, Dashed, Opacity[0.7], Line[{{cutoff, Min[ tT[[All,2]] ]}, {cutoff,  Max[ tT[[All,2]] ]}}]
+        }
             ]
         ]      
     ,
         Graphics[{
-            ColorData[97][2], Line[ Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
+            ColorData[97][2], Line[ tT ]
         }, ImageSize->{500,350}, Background->White,
             Frame->True, Axes->True, "GUI"->False,
-            FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
+            FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"},
+            Epilog->{
+                    Red, Dashed, Opacity[0.7], Line[{{cutoff, Min[ tT[[All,2]] ]}, {cutoff,  Max[ tT[[All,2]] ]}}]
+        }
         ]
     ]
 ]
@@ -316,6 +392,9 @@ views["Alpha", {t_TransmissionObject}] := With[{
 views["Alpha", t: {__TransmissionObject}] := With[{
     fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"]) {1/2.0, 2.0},
     bdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"])
+},
+{
+    cutoff = Max[getCutoff[t[[1]]], fdci[[1]] ]
 },
     With[{
         dataset = Select[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] &/@ t,
@@ -325,13 +404,19 @@ views["Alpha", t: {__TransmissionObject}] := With[{
             step = Ceiling[Differences[ MinMax[bestset[[1, All, 2]]] ][[1]] // Abs, 50],
             palette = Table[ColorData["DarkRainbow"][i / Length[dataset]], {i, Length[dataset]}]
         },
+        {
+            offseted = MapIndexed[Function[{item, index}, 
+                     (# + {0, step (index[[1]] - 1)}) &/@ item
+                ], dataset]
+        },
             Graphics[{
-                Transpose[{palette, MapIndexed[Function[{item, index}, 
-                    Line[ (# + {0, step (index[[1]] - 1)}) &/@ item]
-                ], dataset]}]
+                Transpose[{palette, Line /@ offseted}]
             }, ImageSize->{500,600}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
-                FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"}
+                FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"},
+                Epilog->{
+                    Red, Dashed, Opacity[0.7], Line[{{cutoff, Min[ offseted[[All,All,2]] ]}, {cutoff,  Max[ offseted[[All,All,2]] ]}}]
+                } 
             ]
         ] 
     ] 
@@ -362,11 +447,20 @@ views["n", {t__TransmissionObject}] := Null
 views["n", {t_MaterialParameters}] := With[{
     fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t["FDCI"]) {1/2.0, 2.0}
 },
+{
+    cutoff = Max[getCutoff[t], fdci[[1]] ]
+},
+{
+    tT =  Select[QuantityMagnitude[t["n"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] 
+},
     Graphics[{
-        ColorData[97][2], Line[ Select[QuantityMagnitude[t["n"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
+        ColorData[97][2], Line[ tT ]
     }, ImageSize->{500,150}, Background->White,
         Frame->True, Axes->True, "GUI"->False,
-        FrameLabel->{"wavenumber (cm^{-1})", "refractive index"}
+        FrameLabel->{"wavenumber (cm^{-1})", "refractive index"},
+        Epilog->{
+                    Red, Dashed, Opacity[0.7], Line[{{cutoff, Min[ tT[[All,2]] ]}, {cutoff,  Max[ tT[[All,2]] ]}}]
+        }
     ]
 ]
 
@@ -374,6 +468,9 @@ views["n", {t_MaterialParameters}] := With[{
 views["n", t: {__MaterialParameters}] := With[{
     fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"]) {1/2.0, 2.0},
     bdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"])
+},
+{
+    cutoff = Max[getCutoff[t[[1]]], fdci[[1]] ]
 },
     With[{
         dataset = Select[QuantityMagnitude[#["n"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] &/@ t,
@@ -383,13 +480,19 @@ views["n", t: {__MaterialParameters}] := With[{
             step = Ceiling[Differences[ MinMax[bestset[[1, All, 2]]] ][[1]], 2] // Abs,
             palette = Table[ColorData["DarkRainbow"][i / Length[dataset]], {i, Length[dataset]}]
         },
+        {
+            offseted = MapIndexed[Function[{item, index}, 
+                     (# + {0, step (index[[1]] - 1)}) &/@ item
+                ], dataset]
+        },
             Graphics[{
-                Transpose[{palette, MapIndexed[Function[{item, index}, 
-                    Line[ (# + {0, step (index[[1]] - 1)}) &/@ item]
-                ], dataset]}]
+                Transpose[{palette, Line /@ offseted}]
             }, ImageSize->{500,400}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
-                FrameLabel->{"wavenumber (cm^{-1})", "refractive index"}
+                FrameLabel->{"wavenumber (cm^{-1})", "refractive index"},
+                Epilog->{
+                    Red, Dashed, Opacity[0.7], Line[{{cutoff, Min[ offseted[[All,All,2]] ]}, {cutoff,  Max[ offseted[[All,All,2]] ]}}]
+                } 
             ]
         ] 
     ] 
@@ -423,15 +526,21 @@ head[files_, 1] := With[{
     Title = FileBaseName[files[[1]]["Tags"]["Filename"][[1]]],
     Thickness = QuantityMagnitude[files[[1]]["Thickness"], "Millimeters"],
     RefractiveIndex = files[[1]]["n0"],
+    Aperture = QuantityMagnitude[Lookup[files[[1]]["Tags"], "Aperture", Quantity[2, "Millimeters"]], "Millimeters"],
     Notes = If[StringLength[#] > 0, #, ""] & @ (files[[1]]["Tags"]["Notes"])
+},
+{
+    LimitD = ToString[SetPrecision[getCutoff[files[[1]]], 2]]
 },
     <div class="flex flex-row gap-x-4">
           <div>
             <h3 class="text-base/7 font-semibold text-gray-900"><Title/></h3>
             <small class="mt-1 max-w-2xl text-sm/6 text-gray-500">A summary report on the processed TDS spectrum</small>
             <p class="max-w-2xl text-sm/6 text-gray-500"><Notes/></p>
-            <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Thickness<span class="px-2"><Thickness/></span><span>mm</span></p>
-            <p class="max-w-2xl text-sm/6 text-gray-500">Refractive index<span class="px-2"><RefractiveIndex/></span></p>
+            <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Thickness:<span class="px-2"><Thickness/></span><span>mm</span></p>
+            <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Aperture:<span class="px-2"><Aperture/></span><span>mm</span></p>
+            <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Diffraction low end (24°):<span class="px-2"><LimitD/>cm<sup>-1</sup></span></p>
+            <p class="max-w-2xl text-sm/6 text-gray-700">Refractive index:<span class="px-2"><RefractiveIndex/></span></p>
           </div>
     </div>
 ]
@@ -440,15 +549,21 @@ head[files_, _] := With[{
     ListFiles = StringRiffle[FileBaseName[#["Tags"]["Filename"][[1]]] &/@ files, ", "],
     Thickness = QuantityMagnitude[files[[1]]["Thickness"], "Millimeters"],
     RefractiveIndex = files[[1]]["n0"],
+    Aperture = QuantityMagnitude[Lookup[files[[1]]["Tags"], "Aperture", Quantity[2, "Millimeters"]], "Millimeters"],
     Notes = If[StringLength[#] > 0, #, ""] & @ (files[[1]]["Tags"]["Notes"])
+},
+{
+    LimitD = ToString[SetPrecision[getCutoff[files[[1]]], 2]]
 },
     <div class="flex flex-row gap-x-4">
           <div>
             <h3 class="text-gray-700 uppercase text-md">Summary Report</h3>
             <p class="max-w-2xl text-sm text-gray-500"><Notes/></p>
             <small class="mt-1 max-w-2xl text-sm text-gray-500"><ListFiles/></small>
-            <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Thickness<span class="px-2"><Thickness/></span><span>mm</span></p>
-            <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Refractive index<span class="px-2"><RefractiveIndex/></span></p>
+            <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Thickness:<span class="px-2"><Thickness/></span><span>mm</span></p>
+            <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Aperture:<span class="px-2"><Aperture/></span><span>mm</span></p>
+            <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Diffraction low end (24°):<span class="px-2"><LimitD/>cm<sup>-1</sup></span></p>
+            <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Refractive index:<span class="px-2"><RefractiveIndex/></span></p>
           </div>
     </div>
 ]
