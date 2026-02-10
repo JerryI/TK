@@ -28,18 +28,20 @@ object["Next"] = Function[m,
 
 object["Get"] := material;
 
-update = Function[set,
-        oldset = set;
-        transmission = Append[transmission, {"Thickness"->set["Thickness"], "Gain"->set["Gain"], "PhaseShift"->set["PhaseShift"]}];
-        material = MaterialParameters[transmission, "Target"->"GPU"];
-        alpha = Select[QuantityMagnitude[material["\[Alpha]"], {1/"Centimeters", 1/"Centimeters"}], (#[[1]] >= fdci[[1]] && #[[1]] <= fdci[[2]])&];
-        n = Select[QuantityMagnitude[material["n"], {1/"Centimeters", 1}], (#[[1]] >= fdci[[1]] && #[[1]] <= fdci[[2]])&];
-];
-
 parameters = <|"Thickness" -> OptionValue["Thickness"], "Gain"->OptionValue["Gain"], "PhaseShift"->OptionValue["PhaseShift"]|>;
 
 parameters["Thickness"] = initial["Thickness"];
 parameters["Gain"] = initial["Gain"];
+parameters["Cycles"] = 8;
+
+update = Function[set,
+        oldset = set;
+        transmission = Append[transmission, {"Thickness"->set["Thickness"], "Gain"->set["Gain"], "PhaseShift"->set["PhaseShift"]}];
+        material = MaterialParameters[transmission, "Target"->"GPU", "FabryPerotCycles"->parameters["Cycles"]];
+        alpha = Select[QuantityMagnitude[material["\[Alpha]"], {1/"Centimeters", 1/"Centimeters"}], (#[[1]] >= fdci[[1]] && #[[1]] <= fdci[[2]])&];
+        n = Select[QuantityMagnitude[material["n"], {1/"Centimeters", 1}], (#[[1]] >= fdci[[1]] && #[[1]] <= fdci[[2]])&];
+];
+
 
 
 oldset = parameters;
@@ -52,6 +54,11 @@ With[{
   EventHandler[ev, {
     "Gain" -> Function[value,
       parameters["Gain"] = value;
+      update[parameters];
+    ],
+
+    "Cycles" -> Function[value,
+      parameters["Cycles"] = value;
       update[parameters];
     ],
 
@@ -87,12 +94,14 @@ With[{
         InputRange[ev, t 0.5, t 1.5, t / 150.0, t, "Label"->"Thickness (mm)", "Topic"->"Thickness"]
       ],
       Gain = InputRange[ev, 0.2, 1.8, 0.05, parameters["Gain"], "Label"->"Gain", "Topic"->"Gain"],
+      Cycles = InputRange[ev, 0, 10, 1, parameters["Cycles"], "Label"->"Deconv. interations", "Topic"->"Cycles"],
       Filename = TextView[name // Offload]
     },
       <div class="flex flex-col gap-y-2 pl-3 mt-5">
         <PhaseShift/>
         <Thickness/>
         <Gain/>
+        <Cycles/>
         <div></div>
         <h5 class="text-gray-900">Sample information</h5>
         <Filename/>
