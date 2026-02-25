@@ -530,7 +530,8 @@ head[files_, 1] := With[{
     Notes = If[StringLength[#] > 0, #, ""] & @ (files[[1]]["Tags"]["Notes"])
 },
 {
-    LimitD = ToString[SetPrecision[getCutoff[files[[1]]], 2]]
+    LimitD = ToString[SetPrecision[getCutoff[files[[1]]], 2]],
+    SoundPreview = Lookup[files[[1]]["Tags"], "Sound", "None"]
 },
     <div class="flex flex-row gap-x-4">
           <div>
@@ -541,6 +542,7 @@ head[files_, 1] := With[{
             <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Aperture:<span class="px-2"><Aperture/></span><span>mm</span></p>
             <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Diffraction low end (24°):<span class="px-2"><LimitD/>cm<sup>-1</sup></span></p>
             <p class="max-w-2xl text-sm/6 text-gray-700">Refractive index:<span class="px-2"><RefractiveIndex/></span></p>
+            <p class="max-w-2xl text-sm/6 text-gray-700">Sound:<span class="px-2"><SoundPreview/></span></p>
           </div>
     </div>
 ]

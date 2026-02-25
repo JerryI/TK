@@ -60,26 +60,26 @@ calcPowerSpectrum[spectrum_] := Drop[Drop[spectrum, -Floor[Length[spectrum]/2]],
 getMinMax[spectrum_] := spectrum[[All,1]] // MinMax
 getMaxY[spectrum_] := Max[Drop[spectrum[[All,2]], 8]]
 
-t[ω_, L_, False, n_] := With[{
+t[w_, L_, False, n_] := With[{
   c = 3.0 (*SpB[*)Power[10(*|*),(*|*)10](*]SpB*), cm2THz = 33.4,
-  m = n[ω]
+  m = n[w]
 },
-  (*FB[*)((4m)(*,*)/(*,*)((*SpB[*)Power[(m+1)(*|*),(*|*)2](*]SpB*)))(*]FB*) Exp[- (*FB[*)((I 2π (*SpB[*)Power[10(*|*),(*|*)12](*]SpB*) ω (m-1) L)(*,*)/(*,*)(c cm2THz 10.0))(*]FB*) ] 
+  (*FB[*)((4m)(*,*)/(*,*)((*SpB[*)Power[(m+1)(*|*),(*|*)2](*]SpB*)))(*]FB*) Exp[- (*FB[*)((I 2Pi (*SpB[*)Power[10(*|*),(*|*)12](*]SpB*) w (m-1) L)(*,*)/(*,*)(c cm2THz 10.0))(*]FB*) ] 
 
 ]
 
-t[ω_, L_, True, n_] := With[{
+t[w_, L_, True, n_] := With[{
   c = 3.0 (*SpB[*)Power[10(*|*),(*|*)10](*]SpB*), cm2THz = 33.4,
-  m = n[ω]
+  m = n[w]
 },
-  (*FB[*)((4m)(*,*)/(*,*)((*SpB[*)Power[(m+1)(*|*),(*|*)2](*]SpB*)))(*]FB*) Exp[- (*FB[*)((I 2π (*SpB[*)Power[10(*|*),(*|*)12](*]SpB*) ω (m-1) L)(*,*)/(*,*)(c cm2THz 10.0))(*]FB*) ] (*FB[*)((1)(*,*)/(*,*)(1 - (*SpB[*)Power[((*FB[*)((m - 1)(*,*)/(*,*)(m + 1))(*]FB*))(*|*),(*|*)2](*]SpB*) Exp[-2 (*FB[*)((I 2π (*SpB[*)Power[10(*|*),(*|*)12](*]SpB*) ω m L)(*,*)/(*,*)(c cm2THz 10.0))(*]FB*) ]))(*]FB*)
+  (*FB[*)((4m)(*,*)/(*,*)((*SpB[*)Power[(m+1)(*|*),(*|*)2](*]SpB*)))(*]FB*) Exp[- (*FB[*)((I 2Pi (*SpB[*)Power[10(*|*),(*|*)12](*]SpB*) w (m-1) L)(*,*)/(*,*)(c cm2THz 10.0))(*]FB*) ] (*FB[*)((1)(*,*)/(*,*)(1 - (*SpB[*)Power[((*FB[*)((m - 1)(*,*)/(*,*)(m + 1))(*]FB*))(*|*),(*|*)2](*]SpB*) Exp[-2 (*FB[*)((I 2Pi (*SpB[*)Power[10(*|*),(*|*)12](*]SpB*) w m L)(*,*)/(*,*)(c cm2THz 10.0))(*]FB*) ]))(*]FB*)
 
 ]
 
 calcModel[scale_, fp_, L_, \[Epsilon]_, parametersSet_] := With[{ 
   function =  scale t[
    #, L, fp, 
-   Function[ω, (*SqB[*)Sqrt[\[Epsilon] + Total[Table[ (*FB[*)((p[[1]])(*,*)/(*,*)((*SpB[*)Power[p[[2]](*|*),(*|*)2](*]SpB*) - (*SpB[*)Power[ω(*|*),(*|*)2](*]SpB*) + I p[[3]] ω))(*]FB*) , {p, parametersSet}]]](*]SqB*)]
+   Function[w, (*SqB[*)Sqrt[\[Epsilon] + Total[Table[ (*FB[*)((p[[1]])(*,*)/(*,*)((*SpB[*)Power[p[[2]](*|*),(*|*)2](*]SpB*) - (*SpB[*)Power[w(*|*),(*|*)2](*]SpB*) + I p[[3]] w))(*]FB*) , {p, parametersSet}]]](*]SqB*)]
   ]
 },
   function&
@@ -88,7 +88,7 @@ calcModel[scale_, fp_, L_, \[Epsilon]_, parametersSet_] := With[{
 calcDielectric[scale_, fp_, L_, \[Epsilon]_, parametersSet_] := With[{ 
 
 },
-  Function[ω, (*SqB[*)Sqrt[\[Epsilon] + Total[Table[ (*FB[*)((p[[1]])(*,*)/(*,*)((*SpB[*)Power[p[[2]](*|*),(*|*)2](*]SpB*) - (*SpB[*)Power[ω(*|*),(*|*)2](*]SpB*) + I p[[3]] ω))(*]FB*) , {p, parametersSet}]]](*]SqB*)]
+  Function[w, (*SqB[*)Sqrt[\[Epsilon] + Total[Table[ (*FB[*)((p[[1]])(*,*)/(*,*)((*SpB[*)Power[p[[2]](*|*),(*|*)2](*]SpB*) - (*SpB[*)Power[w(*|*),(*|*)2](*]SpB*) + I p[[3]] w))(*]FB*) , {p, parametersSet}]]](*]SqB*)]
 ]
 
 calcAbsorption[sourceSpectrum_, model_] := With[{ n = -Im[ model[#[[1]]]  ], w = #[[1]]}, 

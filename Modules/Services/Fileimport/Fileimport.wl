@@ -62,7 +62,8 @@ forward[process_, props_] :=
                     "Filename" -> {FileNameTake[pair["Sample"] ], FileNameTake[pair["Reference"] ]}, 
                     "Notes" -> process["Notes"],
                     "Traces" -> {s,r},
-                    "Aperture" -> process["Aperture"]
+                    "Aperture" -> process["Aperture"],
+                    "Sound" -> ListPlay[QuantityMagnitude[s["Trace"], {"Picoseconds", 1}][[All,2]], SampleRate->8000]
                 |>
             ]
         ]
