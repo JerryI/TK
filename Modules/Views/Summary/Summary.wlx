@@ -1,7 +1,10 @@
-views[All] = {"Alpha", "n", "Transmission", "ComplexTransmission", "NKPairs", "Fitting"}
+views[All] = {"Alpha", "AlphaOverlay", "n", "Transmission", "ComplexTransmission", "NKPairs", "Fitting"}
 
 description["Alpha", {t__MaterialParameters}] = {"Absorption", "Absorption coefficient was calculated by solving equations for n and k extracted from the transmission data"}
 description["Alpha", {t__TransmissionObject}] = {"Absorption", "Absorption coefficient was calculated by taking -Log(T)/thickness - (Fresnel losses) using transmission data"}
+
+description["AlphaOverlay", {t__MaterialParameters}] = {"Absorption (overlayed)", "Absorption coefficient was calculated by solving equations for n and k extracted from the transmission data"}
+description["AlphaOverlay", {t__TransmissionObject}] = {"Absorption (overlayed)", "Absorption coefficient was calculated by taking -Log(T)/thickness - (Fresnel losses) using transmission data"}
 
 description["Transmission", _] = {"Transmission Spectrum", ""};
 description["n", {t__MaterialParameters}] = {"Refractive index", "Refractive index was calculated by solving equations for n and k extracted from the transmission data"}
@@ -15,6 +18,7 @@ description["Fitting", _] = {"Fitted oscillators", "Extracted materials paramete
 views["ComplexTransmission", {__TransmissionObject | __MaterialParameters}] := "";
 views["NKPairs", {__TransmissionObject}] := Null;
 views["NKPairs", {__MaterialParameters}] := "";
+viewsWolframQ[_] := True
 
 exporter["ComplexTransmission", {t_TransmissionObject | t_MaterialParameters}] := With[{
     data = QuantityMagnitude[t["Transmission"], {1/"Centimeters",1}],
@@ -125,6 +129,8 @@ views["Alpha", {t_TransmissionObject}] := With[{
     ]
 ]
 
+views["AlphaOverlay", {t_TransmissionObject | t_MaterialParameters}] := Null
+
 views["Alpha", t: {__TransmissionObject}] := With[{
     fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"]) {1/2.0, 2.0},
     bdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"])
@@ -138,6 +144,39 @@ views["Alpha", t: {__TransmissionObject}] := With[{
     },
         With[{
             step = Round[Differences[ MinMax[bestset[[1, All, 2]]] ][[1]], 50],
+            palette = Table[ColorData["DarkRainbow"][i / Length[dataset]], {i, Length[dataset]}]
+        },
+        {
+            offseted = MapIndexed[Function[{item, index}, 
+                    (# + {0, step (index - 1)}) &/@ item
+                ], dataset]
+        },
+            Graphics[{
+                Transpose[{palette, Line /@ offseted}]
+            }, ImageSize->{500,600}, Background->White,
+                Frame->True, Axes->True, "GUI"->False,
+                FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"},
+                Epilog->{
+                    Red, Dashed, Opacity[0.7], Line[{{cutoff, Min[ offseted[[All,All,2]] ]}, {cutoff,  Max[ offseted[[All,All,2]] ]}}]
+                }                
+            ]
+        ] 
+    ] 
+]
+
+views["AlphaOverlay", t: {__TransmissionObject}] := With[{
+    fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"]) {1/2.0, 2.0},
+    bdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"])
+},
+{
+    cutoff = Max[getCutoff[t[[1]]], fdci[[1]] ]
+},
+    With[{
+        dataset = Select[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] &/@ t,
+        bestset = Select[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= bdci[[1]] && i[[1]] <= bdci[[2]]]] &/@ t
+    },
+        With[{
+            step = 0,
             palette = Table[ColorData["DarkRainbow"][i / Length[dataset]], {i, Length[dataset]}]
         },
         {
@@ -304,6 +343,43 @@ views["Alpha", t: {__MaterialParameters}] := With[{
     ] 
 ]
 
+views["AlphaOverlay", t: {__MaterialParameters}] := With[{
+    fdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"]) {1/2.0, 2.0},
+    bdci = (QuantityMagnitude[#, 1/"Centimeters"] &/@ t[[1]]["FDCI"])
+},
+{
+    cutoff = Max[getCutoff[t[[1]]], fdci[[1]] ]
+},
+    With[{
+        dataset = Select[QuantityMagnitude[#["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] &/@ t,
+        bestset = Select[QuantityMagnitude[#["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= bdci[[1]] && i[[1]] <= bdci[[2]]]] &/@ t
+    },
+        With[{
+            step = 0,
+            palette = Table[ColorData["DarkRainbow"][i / Length[dataset]], {i, Length[dataset]}]
+        },
+        {
+            offseted = MapIndexed[Function[{item, index}, 
+                   (# + {0, step (index[[1]] - 1)}) &/@ item
+                ], dataset]
+        },
+            Graphics[{
+                Transpose[{palette, Line /@ offseted}]
+            }, ImageSize->{500,600}, Background->White,
+                Frame->True, Axes->True, "GUI"->False,
+                FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"},
+                Epilog->{
+                    Red, Dashed, Opacity[0.7], Line[{{cutoff, Min[ offseted[[All,All,2]] ]}, {cutoff,  Max[ offseted[[All,All,2]] ]}}]
+                }  
+                
+            ]
+        ] 
+    ] 
+]
+
+exporter["AlphaOverlay", _] := Null;
+exporter["AlphaOverlay", {__}] := Null;
+
 exporter["Alpha", t:{__MaterialParameters}] := With[{
     data = QuantityMagnitude[#["\[Alpha]"], {1,1}/"Centimeters"] &/@ t,
     names = StringJoin[FileBaseName[#["Tags"]["Filename"][[1]]], ".dat"] &/@ t
@@ -323,8 +399,10 @@ exporter["Alpha", {t_MaterialParameters}] := With[{data = QuantityMagnitude[t["\
     ]];
 ]
 
-exporter["Fitting", {__}] := Null;
+exporter["Fitting", _] := Null;
 views["Fitting", {__}] := Null;
+
+viewsWolframQ["Fitting"] = "wlx";
 
 views["Fitting", {t_TransmissionObject | t_MaterialParameters}] := If[KeyExistsQ[t["Tags"], "Fitting"],
     With[{
@@ -517,6 +595,69 @@ exporter["n", {t_MaterialParameters}] := With[{data = QuantityMagnitude[t["n"], 
     ]];
 ]
 
+exportNotebook[files_, _] := With[{
+    ListFiles = FileBaseName[#["Tags"]["Filename"][[1]]] &/@ files,
+    Thickness = QuantityMagnitude[files[[1]]["Thickness"], "Millimeters"],
+    RefractiveIndex = files[[1]]["n0"],
+    Aperture = QuantityMagnitude[Lookup[files[[1]]["Tags"], "Aperture", Quantity[2, "Millimeters"]], "Millimeters"],
+    Notes = If[StringLength[#] > 0, #, ""] & @ (files[[1]]["Tags"]["Notes"])
+},
+{
+    LimitD = ToString[SetPrecision[getCutoff[files[[1]]], 2]]
+},
+    CreateDocument[{
+        TextCell[StringJoin["THz Measurements Summary Report", "" ], "Title"],
+        TextCell[StringJoin["A summary report on the processed TDS spectrum. List of files:\n",
+            StringRiffle[Map[StringTemplate["- ``"], ListFiles], "\n"]
+        ]],
+        TextCell[StringRiffle[{"## Summary\n",   ToString[Notes],
+            StringTemplate["- Thickness: `` mm"][Thickness],
+            StringTemplate["- Aperture: `` mm"][Aperture],
+            StringTemplate["- Diffraction low end (24°): `` (1/cm)"][LimitD],
+            StringTemplate["- Refractive index: ``"][RefractiveIndex],
+            StringTemplate["- Thickness: `` mm"][Thickness]
+        }, "\n"]],
+
+        Sequence @@ (With[{window = views[#, files]}, If[window =!= Null && window =!= "", CellGroup[{
+            TextCell[description[#, files][[1]], "Section"],
+            TextCell[description[#, files][[2]], "Text"],
+            If[TrueQ[viewsWolframQ[#]], ExpressionCell[window, "Input"], ExpressionCell[window, "Output", viewsWolframQ[#]]]
+        }], Nothing]] &/@ views[All])
+    }]
+];
+
+exportNotebook[files_, 1] := With[{
+    Title = FileBaseName[files[[1]]["Tags"]["Filename"][[1]]],
+    Thickness = QuantityMagnitude[files[[1]]["Thickness"], "Millimeters"],
+    RefractiveIndex = files[[1]]["n0"],
+    Aperture = QuantityMagnitude[Lookup[files[[1]]["Tags"], "Aperture", Quantity[2, "Millimeters"]], "Millimeters"],
+    Notes = If[StringLength[#] > 0, #, ""] & @ (files[[1]]["Tags"]["Notes"])
+},
+{
+    LimitD = ToString[SetPrecision[getCutoff[files[[1]]], 2]],
+    SoundPreview = Lookup[files[[1]]["Tags"], "Sound", "None"]
+},
+    CreateDocument[{
+        TextCell[StringJoin["THz Measurements Report: ", ToString[Title] ], "Title"],
+        TextCell["A summary report on the processed TDS spectrum"],
+        TextCell[StringRiffle[{   ToString[Notes],
+            StringTemplate["- Thickness: `` mm"][Thickness],
+            StringTemplate["- Aperture: `` mm"][Aperture],
+            StringTemplate["- Diffraction low end (24°): `` (1/cm)"][LimitD],
+            StringTemplate["- Refractive index: ``"][RefractiveIndex],
+            StringTemplate["- Thickness: `` mm"][Thickness],
+            "\n\nUnique sound print:"
+        }, "\n"]],
+
+        ExpressionCell[SoundPreview, "Output"],
+
+        Sequence @@ (With[{window = views[#, files]}, If[window =!= Null && window =!= "", CellGroup[{
+            TextCell[description[#, files][[1]], "Section"],
+            TextCell[description[#, files][[2]]],
+            If[TrueQ[viewsWolframQ[#]], ExpressionCell[window, "Input"], ExpressionCell[window, "Output", viewsWolframQ[#]]]
+        }], Nothing]] &/@ views[All])
+    }]
+];
 
 singleList[f_List] := Length[f] === 1
 
@@ -542,7 +683,8 @@ head[files_, 1] := With[{
             <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Aperture:<span class="px-2"><Aperture/></span><span>mm</span></p>
             <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Diffraction low end (24°):<span class="px-2"><LimitD/>cm<sup>-1</sup></span></p>
             <p class="max-w-2xl text-sm/6 text-gray-700">Refractive index:<span class="px-2"><RefractiveIndex/></span></p>
-            <p class="max-w-2xl text-sm/6 text-gray-700">Sound:<span class="px-2"><SoundPreview/></span></p>
+            <p class="max-w-2xl text-sm/6 text-gray-700">Unique audio print:<span class="px-2"><SoundPreview/></span></p>
+            <ButtonWrapper Class={"mt-1"} Action={Hold[exportNotebook[files, 1]]} >Show as notebook</ButtonWrapper>
           </div>
     </div>
 ]
@@ -566,6 +708,7 @@ head[files_, _] := With[{
             <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Aperture:<span class="px-2"><Aperture/></span><span>mm</span></p>
             <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Diffraction low end (24°):<span class="px-2"><LimitD/>cm<sup>-1</sup></span></p>
             <p class="mt-1 max-w-2xl text-sm/6 text-gray-700">Refractive index:<span class="px-2"><RefractiveIndex/></span></p>
+            <ButtonWrapper Class={"mt-1"} Action={Hold[exportNotebook[files, Null]]} >Show as notebook</ButtonWrapper>
           </div>
     </div>
 ]
@@ -581,6 +724,12 @@ Component[files_List] := Block[{terakitchen`$sessionViewId(*`*) = CreateUUID[]},
         NameView = description[#, files][[1]],
         ShortInfo =  description[#, files][[2]]
     },
+    {
+        ExporterButton = If[exporter[#, Null] =!= Null,
+            <ButtonWrapper Class={"ml-auto"} Action={Hold[exporterModule[]]} Icon={svgIcon}>Export</ButtonWrapper>,
+            ""
+        ]
+    },
     
     If[MainWindow === Null,
         ""
@@ -591,7 +740,7 @@ Component[files_List] := Block[{terakitchen`$sessionViewId(*`*) = CreateUUID[]},
                     <h4 class="text-gray-700 uppercase text-md"><NameView/></h4>
                     <small class="mt-1 max-w-2xl text-sm text-gray-500"><ShortInfo/></small>
                 </div>
-                <ButtonWrapper Class={"ml-auto"} Action={Hold[exporterModule]} Icon={svgIcon}>Export</ButtonWrapper>
+                <ExporterButton/>
             </div>
             <div class="relative"><MainWindow/></div>
         </p>
