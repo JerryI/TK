@@ -1,5 +1,5 @@
 BeginPackage["JerryI`Terakitchen`Process`", {
-    "CoffeeLiqueur`Objects`",
+    "CoffeeLiqueur`UObjects`",
     "CoffeeLiqueur`Misc`Events`",
     "CoffeeLiqueur`Misc`Events`Promise`"
 }]
@@ -8,7 +8,7 @@ processObject;
 
 Begin["`Private`"]
 
-CreateType[processObject, init, {
+CreateUType[processObject, init, {
     "Title" -> "Generic",
     "State" -> "Unknown",
     "Progress" -> 0.0,
