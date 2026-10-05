@@ -1,8 +1,13 @@
 sampleList[l_List] := ArrayResample[l, 300, Resampling->"Nearest"] /; Length[l] > 300;
 sampleList[l_List] := l;
 
-generatePreview[t_MaterialParameters, fdci_] := Graphics[{ColorData[97][2], Line[sampleList @ Select[QuantityMagnitude[t["\[Alpha]"], {1/"Centimeters", 1/"Centimeters"}], Function[item, item[[1]] >= fdci[[1]] && item[[1]] <= fdci[[2]] ]] ]}, ImageSize->{350,35}, ImagePadding->None, Axes->{True, False}, "GUI"->False, "Controls"->False];
-generatePreview[t_TransmissionObject, fdci_] := Graphics[{ColorData[97][1], Line[sampleList @ Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1/"Centimeters", 1/"Centimeters"}], Function[item, item[[1]] >= fdci[[1]] && item[[1]] <= fdci[[2]] ]] ]}, ImageSize->{350,35}, ImagePadding->None, Axes->{True, False}, "GUI"->False, "Controls"->False];
+previewRange[data_List, fdci : {_?NumberQ, _?NumberQ}] := With[{
+  selected = Select[data, fdci[[1]] <= #[[1]] <= fdci[[2]] &]
+}, If[Length[selected] >= 2, selected, data]];
+previewRange[data_List, _] := data;
+
+generatePreview[t_MaterialParameters, _] := Graphics[{ColorData[97][2], Line[sampleList @ previewRange[QuantityMagnitude[t["\[Alpha]"], {1/"Centimeters", 1/"Centimeters"}], getFDCI[t]]]}, ImageSize->{350,35}, ImagePadding->None, Axes->{True, False}, "GUI"->False, "Controls"->False];
+generatePreview[t_TransmissionObject, _] := Graphics[{ColorData[97][1], Line[sampleList @ previewRange[QuantityMagnitude[t["Approximated \[Alpha]"], {1/"Centimeters", 1/"Centimeters"}], getFDCI[t]]]}, ImageSize->{350,35}, ImagePadding->None, Axes->{True, False}, "GUI"->False, "Controls"->False];
 
 generatePreview[_, _] := <span class="text-red-300 text-red-400 uppercase">unprocessed</span>;
 
@@ -18,16 +23,13 @@ getThickness[_] := "N/A"
 getFDCI[t_MaterialParameters | t_TransmissionObject] := (QuantityMagnitude[#, 1/"Centimeters"] &/@ t["FDCI"]) {0.6, 1.4}
 getFDCI[_] := {}
 
-getFDCI[l_List] := getFDCI[SelectFirst[l, MatchQ[#, _MaterialParameters | _TransmissionObject]&]]
-
 tableWidget[files_List, Event_String, allowP_:False] := With[{
-  fdci = getFDCI[files],
   allowProcess = If[allowP, "", "hidden"]
 }, With[{
   ListTable = Table[With[{
       RefractiveIndex = getIndex[file],
       Thickness = getThickness[file],
-      Preview = generatePreview[file, fdci],
+      Preview = generatePreview[file, Null],
       Title = getTitle[file]
   },
       <tr class="hover:bg-sky-100 focus:outline-none cursor-pointer" tabindex="1">

@@ -69,6 +69,11 @@ exporter["NKPairs", t: {__MaterialParameters}] := With[{
 
 clipT[list_List] := Map[{#[[1]], Clip[#[[2]], {0,1}]}&, list]
 
+selectDisplayRange[data_List, fdci : {_?NumberQ, _?NumberQ}] := With[{
+    selected = Select[data, fdci[[1]] <= #[[1]] <= fdci[[2]] &]
+}, If[Length[selected] >= 2, selected, data]];
+selectDisplayRange[data_List, _] := data;
+
 getCutoff[t_TransmissionObject | t_MaterialParameters] := With[{aperture = QuantityMagnitude[Lookup[t["Tags"], "Aperture", Quantity[1, "Millimeters"]], "Millimeters"]},
     Round[16.5 / aperture, 0.5]
 ]
@@ -79,7 +84,7 @@ views["Transmission", {t_TransmissionObject | t_MaterialParameters}] := With[{
     cutoff = Max[getCutoff[t], fdci[[1]] ]
 },
 {
-    tT = Select[QuantityMagnitude[t["Transmission"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] // clipT
+    tT = selectDisplayRange[QuantityMagnitude[t["Transmission"], {1/"Centimeters",1}], fdci] // clipT
 },
     If[KeyExistsQ[t["Tags"], "Fitting"] && False,
         With[{
@@ -87,7 +92,7 @@ views["Transmission", {t_TransmissionObject | t_MaterialParameters}] := With[{
         },
             Graphics[{
                 ColorData[97][5], Line[ tT ],
-                Dashed, ColorData[97][8], Line[ Select[QuantityMagnitude[cached["Transmission"], {1/"Centimeters", 1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
+                Dashed, ColorData[97][8], Line[ selectDisplayRange[QuantityMagnitude[cached["Transmission"], {1/"Centimeters", 1}], fdci] ]
             }, ImageSize->{500,350}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
                 FrameLabel->{"wavenumber (cm^{-1})", "T"},
@@ -116,7 +121,7 @@ views["Alpha", {t_TransmissionObject}] := With[{
     cutoff = Max[getCutoff[t], fdci[[1]] ]
 },
 {
-    tT = Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]]
+    tT = selectDisplayRange[QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"], fdci]
 },
     Graphics[{
         ColorData[97][2], Line[ tT ]
@@ -139,8 +144,8 @@ views["Alpha", t: {__TransmissionObject}] := With[{
     cutoff = Max[getCutoff[t[[1]]], fdci[[1]] ]
 },
     With[{
-        dataset = Select[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] &/@ t,
-        bestset = Select[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= bdci[[1]] && i[[1]] <= bdci[[2]]]] &/@ t
+        dataset = selectDisplayRange[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], fdci] &/@ t,
+        bestset = selectDisplayRange[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], bdci] &/@ t
     },
         With[{
             step = Round[Differences[ MinMax[bestset[[1, All, 2]]] ][[1]], 50],
@@ -172,8 +177,8 @@ views["AlphaOverlay", t: {__TransmissionObject}] := With[{
     cutoff = Max[getCutoff[t[[1]]], fdci[[1]] ]
 },
     With[{
-        dataset = Select[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] &/@ t,
-        bestset = Select[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= bdci[[1]] && i[[1]] <= bdci[[2]]]] &/@ t
+        dataset = selectDisplayRange[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], fdci] &/@ t,
+        bestset = selectDisplayRange[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], bdci] &/@ t
     },
         With[{
             step = 0,
@@ -205,8 +210,8 @@ views["Transmission", t: ({__TransmissionObject} | {__MaterialParameters})] := W
     cutoff = Max[getCutoff[t[[1]]], fdci[[1]] ]
 },
     With[{
-        dataset = clipT[Select[QuantityMagnitude[#["Transmission"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]]] &/@ t,
-        bestset = clipT[Select[QuantityMagnitude[#["Transmission"], {1/"Centimeters",1}], Function[i, i[[1]] >= bdci[[1]] && i[[1]] <= bdci[[2]]]]] &/@ t
+        dataset = clipT[selectDisplayRange[QuantityMagnitude[#["Transmission"], {1/"Centimeters",1}], fdci]] &/@ t,
+        bestset = clipT[selectDisplayRange[QuantityMagnitude[#["Transmission"], {1/"Centimeters",1}], bdci]] &/@ t
     },
         With[{
             step = Ceiling[Differences[ MinMax[bestset[[1, All, 2]]] ][[1]], 0.5] // Abs,
@@ -275,7 +280,7 @@ views["Alpha", {t_MaterialParameters}] := With[{
     cutoff = Max[getCutoff[t], fdci[[1]] ]
 },
 {
-    tT = Select[QuantityMagnitude[t["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]]
+    tT = selectDisplayRange[QuantityMagnitude[t["\[Alpha]"], {1,1}/"Centimeters"], fdci]
 },
 
     If[KeyExistsQ[t["Tags"], "Fitting"],
@@ -284,7 +289,7 @@ views["Alpha", {t_MaterialParameters}] := With[{
         },
             Graphics[{
                 ColorData[97][2], Line[ tT ],
-                Opacity[0.5], Red, Line[ Select[QuantityMagnitude[cached["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
+                Opacity[0.5], Red, Line[ selectDisplayRange[QuantityMagnitude[cached["\[Alpha]"], {1,1}/"Centimeters"], fdci] ]
             }, ImageSize->{500,350}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
                 FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"},
@@ -317,8 +322,8 @@ views["Alpha", t: {__MaterialParameters}] := With[{
     cutoff = Max[getCutoff[t[[1]]], fdci[[1]] ]
 },
     With[{
-        dataset = Select[QuantityMagnitude[#["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] &/@ t,
-        bestset = Select[QuantityMagnitude[#["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= bdci[[1]] && i[[1]] <= bdci[[2]]]] &/@ t
+        dataset = selectDisplayRange[QuantityMagnitude[#["\[Alpha]"], {1,1}/"Centimeters"], fdci] &/@ t,
+        bestset = selectDisplayRange[QuantityMagnitude[#["\[Alpha]"], {1,1}/"Centimeters"], bdci] &/@ t
     },
         With[{
             step = Ceiling[Differences[ MinMax[bestset[[1, All, 2]]] ][[1]] // Abs, 50],
@@ -351,8 +356,8 @@ views["AlphaOverlay", t: {__MaterialParameters}] := With[{
     cutoff = Max[getCutoff[t[[1]]], fdci[[1]] ]
 },
     With[{
-        dataset = Select[QuantityMagnitude[#["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] &/@ t,
-        bestset = Select[QuantityMagnitude[#["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= bdci[[1]] && i[[1]] <= bdci[[2]]]] &/@ t
+        dataset = selectDisplayRange[QuantityMagnitude[#["\[Alpha]"], {1,1}/"Centimeters"], fdci] &/@ t,
+        bestset = selectDisplayRange[QuantityMagnitude[#["\[Alpha]"], {1,1}/"Centimeters"], bdci] &/@ t
     },
         With[{
             step = 0,
@@ -437,7 +442,7 @@ views["Alpha", {t_TransmissionObject}] := With[{
     cutoff = Max[getCutoff[t], fdci[[1]] ]
 },
 {
-    tT = Select[QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]]
+    tT = selectDisplayRange[QuantityMagnitude[t["Approximated \[Alpha]"], {1,1}/"Centimeters"], fdci]
 },
     If[KeyExistsQ[t["Tags"], "Fitting"],
         With[{
@@ -445,7 +450,7 @@ views["Alpha", {t_TransmissionObject}] := With[{
         },
             Graphics[{
                 ColorData[97][2], Line[ tT ],
-                Dashed, ColorData[97][7], Line[ Select[QuantityMagnitude[cached["\[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] ]
+                Dashed, ColorData[97][7], Line[ selectDisplayRange[QuantityMagnitude[cached["\[Alpha]"], {1,1}/"Centimeters"], fdci] ]
             }, ImageSize->{500,350}, Background->White,
                 Frame->True, Axes->True, "GUI"->False,
                 FrameLabel->{"wavenumber (cm^{-1})", "absorption coefficient (cm^{-1})"},
@@ -475,8 +480,8 @@ views["Alpha", t: {__TransmissionObject}] := With[{
     cutoff = Max[getCutoff[t[[1]]], fdci[[1]] ]
 },
     With[{
-        dataset = Select[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] &/@ t,
-        bestset = Select[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], Function[i, i[[1]] >= bdci[[1]] && i[[1]] <= bdci[[2]]]] &/@ t
+        dataset = selectDisplayRange[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], fdci] &/@ t,
+        bestset = selectDisplayRange[QuantityMagnitude[#["Approximated \[Alpha]"], {1,1}/"Centimeters"], bdci] &/@ t
     },
         With[{
             step = Ceiling[Differences[ MinMax[bestset[[1, All, 2]]] ][[1]] // Abs, 50],
@@ -529,7 +534,7 @@ views["n", {t_MaterialParameters}] := With[{
     cutoff = Max[getCutoff[t], fdci[[1]] ]
 },
 {
-    tT =  Select[QuantityMagnitude[t["n"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] 
+    tT = selectDisplayRange[QuantityMagnitude[t["n"], {1/"Centimeters",1}], fdci]
 },
     Graphics[{
         ColorData[97][2], Line[ tT ]
@@ -551,8 +556,8 @@ views["n", t: {__MaterialParameters}] := With[{
     cutoff = Max[getCutoff[t[[1]]], fdci[[1]] ]
 },
     With[{
-        dataset = Select[QuantityMagnitude[#["n"], {1/"Centimeters",1}], Function[i, i[[1]] >= fdci[[1]] && i[[1]] <= fdci[[2]]]] &/@ t,
-        bestset = Select[QuantityMagnitude[#["n"], {1/"Centimeters",1}], Function[i, i[[1]] >= bdci[[1]] && i[[1]] <= bdci[[2]]]] &/@ t
+        dataset = selectDisplayRange[QuantityMagnitude[#["n"], {1/"Centimeters",1}], fdci] &/@ t,
+        bestset = selectDisplayRange[QuantityMagnitude[#["n"], {1/"Centimeters",1}], bdci] &/@ t
     },
         With[{
             step = Ceiling[Differences[ MinMax[bestset[[1, All, 2]]] ][[1]], 2] // Abs,
