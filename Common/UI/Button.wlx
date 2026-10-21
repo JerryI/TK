@@ -8,10 +8,10 @@ Component[Title_String, OptionsPattern[]] := With[{
 
 EventHandler[Event, {
     "StartLoader" -> Function[Null,
-        EventFire[controller, "Start", <|"Client"->Global`$Client (*`*)|>]
+        EventFire[controller, "Start", <|"Client"->$CurrentWebSocket (*`*)|>]
     ],
     "StopLoader" -> Function[Null,
-        EventFire[controller, "Stop", <|"Client"->Global`$Client (*`*)|>]
+        EventFire[controller, "Stop", <|"Client"->$CurrentWebSocket (*`*)|>]
     ]
 }];
 

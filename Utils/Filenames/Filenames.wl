@@ -1,7 +1,6 @@
 BeginPackage["JerryI`Terakitchen`Utils`Filenames`", {
     "CoffeeLiqueur`Misc`Events`",
     "CoffeeLiqueur`Misc`Events`Promise`",
-    "CoffeeLiqueur`Misc`WLJS`Transport`",
     "CoffeeLiqueur`Misc`Language`",
     "CoffeeLiqueur`WLX`",
     "CoffeeLiqueur`WLX`Importer`"

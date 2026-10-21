@@ -5,7 +5,7 @@ WindowContainer[process_, notebook_] := With[{
     onload = CreateUUID[],
     miscControls = CreateUUID[]
 },
-    EventHandler[onload, Function[Null, With[{cli = Global`$Client (*`*)},
+    EventHandler[onload, Function[Null, With[{cli = $CurrentWebSocket (*`*)},
       EventHandler[controls, {
         "Destroy" -> Function[Null,
           WebUIClose[cli]
@@ -15,7 +15,7 @@ WindowContainer[process_, notebook_] := With[{
 
     If[TrueQ[process["ValidQ"]],
       With[{
-        Widget = process["View"][<|"Client" -> Global`$Client(*`*), "GlobalControls" -> controls, "Self" -> process|>]
+        Widget = process["View"][<|"Client" -> $CurrentWebSocket(*`*), "GlobalControls" -> controls, "Self" -> process|>]
       },
         {
           <WindowWrapper Controls={controls} Button={process["NeedsButton"]} Title={process["Title"]} State={process["State"]} Progress={process["Progress"]}>
