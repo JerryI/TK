@@ -8,7 +8,7 @@ Component[samples_List, references_List, connectivity_Association, updater_] := 
 
     TBody = Table[
         With[{
-            sampleName = samples[[sampleIndex]],
+            SampleName = samples[[sampleIndex]],
             References = Table[
                 With[{referenceName = references[[referenceIndex]]},
                     If[connectivity[samples[[sampleIndex]]] === referenceName,
@@ -21,7 +21,7 @@ Component[samples_List, references_List, connectivity_Association, updater_] := 
         },
 
             <tr>
-                <th><sampleName/></th>
+                <th><SampleName/></th>
                 <References/>
             </tr>
         ]
