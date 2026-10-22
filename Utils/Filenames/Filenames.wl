@@ -110,20 +110,34 @@ refWidget[base_, c_, OptionsPattern[] ] := Module[{
     refs = Table[StringReplace[FileBaseName[base[["Reference", i, "Path"]]], "_"->"_"], {i, 1, lr}],
     smpls = Table[StringReplace[FileBaseName[base[["Sample", i, "Path"]]], "_"->"_"], {i, 1, ls}]
   }, {
-    initialConnections = Association[Table[smpls[[i]] -> SortBy[Transpose[{refs, -connections[[i]]}], Last][[-1,1]], {i, 1, ls}] ]
+    initialReferenceIndices = Table[
+      Last @ Flatten @ Position[connections[[i]], Min[connections[[i]]]],
+      {i, 1, ls}
+    ]
   },
+    With[{initialConnections = Association[Table[
+      smpls[[i]] -> refs[[initialReferenceIndices[[i]]]],
+      {i, 1, ls}
+    ]]},
 
-    object["View"] = tableTemplate[smpls, refs, initialConnections, Function[update,
-      With[{
-        r = normalizeSelectionIndex[update[[1]]],
-        s = normalizeSelectionIndex[update[[2]]]
-      },
-        If[
-          IntegerQ[r] && 1 <= r <= lr && IntegerQ[s] && 1 <= s <= ls,
-          connections[[s]] = Table[-KroneckerDelta[i, r], {i, 1, lr}]
-        ];
-      ]
-    ] ];
+      (* Make the backend state match the radio buttons before any click occurs. *)
+      connections = Table[
+        Table[-KroneckerDelta[j, initialReferenceIndices[[i]]], {j, 1, lr}],
+        {i, 1, ls}
+      ];
+
+      object["View"] = tableTemplate[smpls, refs, initialConnections, Function[update,
+        With[{
+          r = normalizeSelectionIndex[update[[1]]],
+          s = normalizeSelectionIndex[update[[2]]]
+        },
+          If[
+            IntegerQ[r] && 1 <= r <= lr && IntegerQ[s] && 1 <= s <= ls,
+            connections[[s]] = Table[-KroneckerDelta[i, r], {i, 1, lr}]
+          ];
+        ]
+      ] ];
+    ];
   ];
 
   object
