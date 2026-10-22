@@ -105,7 +105,7 @@ Component[samples_List, references_List, connectivity_Association, updater_] := 
           const radio = body.getElementsByTagName('input');
           for (let i = 0; i < radio.length; i++) {
             radio[i].addEventListener('change', () => {
-              const selection = [Number(radio[i].value), Number(radio[i].name)];
+              const selection = [radio[i].value, radio[i].name];
               console.log(selection);
               server.kernel.io.fire('<UId/>', selection);
             });

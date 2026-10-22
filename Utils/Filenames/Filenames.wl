@@ -75,6 +75,13 @@ formPairs[base_, connections_] := Table[With[{ref = Ordering[connections[[i]]][[
 applyPatch[{x_, x_}] := {1.5 x, 0.9 x}
 applyPatch[{x_, y_}] := {x, y}
 
+normalizeSelectionIndex[value_] := Which[
+  IntegerQ[value], value,
+  NumberQ[value] && value == Round[value], Round[value],
+  StringQ[value] && StringMatchQ[value, DigitCharacter..], FromDigits[value],
+  True, Missing["InvalidSelectionIndex", value]
+]
+
 refWidget[base_, c_, OptionsPattern[] ] := Module[{
   gridColors, connections, board,
   object
@@ -108,8 +115,8 @@ refWidget[base_, c_, OptionsPattern[] ] := Module[{
 
     object["View"] = tableTemplate[smpls, refs, initialConnections, Function[update,
       With[{
-        r = update[[1]],
-        s = update[[2]]
+        r = normalizeSelectionIndex[update[[1]]],
+        s = normalizeSelectionIndex[update[[2]]]
       },
         If[
           IntegerQ[r] && 1 <= r <= lr && IntegerQ[s] && 1 <= s <= ls,
