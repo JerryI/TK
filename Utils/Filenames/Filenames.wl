@@ -108,10 +108,13 @@ refWidget[base_, c_, OptionsPattern[] ] := Module[{
 
     object["View"] = tableTemplate[smpls, refs, initialConnections, Function[update,
       With[{
-        r = Position[refs,  update[[1]]][[1,1]],
-        s = Position[smpls, update[[2]]][[1,1]]
+        r = update[[1]],
+        s = update[[2]]
       },
-        connections[[s]] = Table[-KroneckerDelta[i, r], {i, 1, Length[refs]}];
+        If[
+          IntegerQ[r] && 1 <= r <= lr && IntegerQ[s] && 1 <= s <= ls,
+          connections[[s]] = Table[-KroneckerDelta[i, r], {i, 1, lr}]
+        ];
       ]
     ] ];
   ];

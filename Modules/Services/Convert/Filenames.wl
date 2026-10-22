@@ -13,7 +13,7 @@ Begin["`Private`"]
 
 
 groupFilesByTags[files_] := With[{groups = GroupBy[ <|"Tags" -> StringSplit[FileNameTake[#], "_"|"."], "Path"->#|> &/@ files, Function[item,
-  If[Or @@ Map[StringMatchQ[#, ___~~("+45" | "180" )~~___, IgnoreCase -> True]&, item["Tags"] ],
+  If[Or @@ Map[StringMatchQ[#, ___~~("+45" | "180" | "XY" )~~___, IgnoreCase -> True]&, item["Tags"] ],
     "Reference", "Sample"
   ]
 ] ]},
@@ -61,7 +61,7 @@ createView[process_][props_] :=  With[{event = CreateUUID[]}, With[{
 sortFileNames = jtuf`sortFileNames;
 
 loadFiles[files_List] := Module[{}, With[{
-    p = jtp`processObject["Title" -> "Names decoder", "NeedsButton" -> True, "State" -> "Check pairs of +/- polarization", "NeedsWindow"->True ]
+    p = jtp`processObject["Title" -> "Names decoder", "NeedsButton" -> True, "State" -> "Check polarization pairs (+45/-45, 180/90, or XY/YX)", "NeedsWindow"->True ]
 },
     If[Length[files] == 0, 
         EventFire[p["Promise"], Reject, "Files are missing"];
